@@ -1,196 +1,80 @@
 # ============================================================
-#  VentanaPrincipal - Ventana raiz de la aplicacion
-#  Muestra la pantalla de bienvenida y gestiona la navegacion
+#  ventana_principal.py  -  Ventana raiz / ensamblador
+# ------------------------------------------------------------
+#  AQUI VA: el armado general de la ventana. Crea el header y
+#  coloca los 3 paneles (parametros | flujo | resultados).
+#
+#  RESPONSABILIDAD: ORQUESTAR. Conecta el boton "Iniciar" del
+#  panel de parametros con la simulacion, y reparte los
+#  resultados a los paneles de flujo y resultados.
+#  NO contiene detalles visuales de cada columna (eso vive en
+#  cada panel_*.py).
 # ============================================================
 
 import tkinter as tk
-from tkinter import ttk, font
-
-
-# Paleta de colores del simulador
-COLORES = {
-    "fondo":        "#1E1E2E",   # fondo oscuro principal
-    "panel":        "#2A2A3E",   # fondo de paneles
-    "acento":       "#7C3AED",   # violeta UTN / accion principal
-    "acento_hover": "#6D28D9",
-    "rojo":         "#EF4444",   # canal Reventa
-    "verde":        "#22C55E",   # canal Reciclaje
-    "gris":         "#6B7280",   # canal Desecho
-    "texto":        "#F1F5F9",
-    "subtexto":     "#94A3B8",
-}
+from src.gui.tema import COLORES, FUENTES, MEDIDAS
+from src.gui.panel_parametros import PanelParametros
+from src.gui.panel_flujo import PanelFlujo
+from src.gui.panel_resultados import PanelResultados
 
 
 class VentanaPrincipal:
-    """Ventana principal del simulador E-Waste."""
-
     def __init__(self, root: tk.Tk):
         self.root = root
         self._configurar_ventana()
-        self._construir_ui()
-
-    # ----------------------------------------------------------
-    #  Configuracion de la ventana
-    # ----------------------------------------------------------
+        self._header()
+        self._cuerpo()
 
     def _configurar_ventana(self):
-        self.root.title("Simulador | Scrap y Rezagos S.R.L.")
-        self.root.geometry("1100x700")
-        self.root.minsize(900, 600)
+        self.root.title("Simulador de Clasificacion de RAEE | Scrap y Rezagos S.R.L.")
+        ancho, alto = MEDIDAS["ancho_ventana"], MEDIDAS["alto_ventana"]
         self.root.configure(bg=COLORES["fondo"])
-        # Centrar en pantalla
         self.root.update_idletasks()
-        x = (self.root.winfo_screenwidth()  - 1100) // 2
-        y = (self.root.winfo_screenheight() - 700)  // 2
-        self.root.geometry(f"1100x700+{x}+{y}")
+        x = (self.root.winfo_screenwidth()  - ancho) // 2
+        y = (self.root.winfo_screenheight() - alto)  // 2
+        self.root.geometry(f"{ancho}x{alto}+{x}+{y}")
+        self.root.minsize(1000, 520)
 
-    # ----------------------------------------------------------
-    #  Construccion de la UI
-    # ----------------------------------------------------------
-
-    def _construir_ui(self):
-        self._barra_superior()
-        self._contenido_bienvenida()
-        self._barra_inferior()
-
-    def _barra_superior(self):
-        barra = tk.Frame(self.root, bg=COLORES["panel"], height=60)
-        barra.pack(fill="x", side="top")
+    def _header(self):
+        barra = tk.Frame(self.root, bg=COLORES["header"], height=60)
+        barra.pack(fill="x")
         barra.pack_propagate(False)
+        tk.Label(barra, text="SIMULADOR DE CLASIFICACION DE RAEE",
+                 bg=COLORES["header"], fg=COLORES["texto_claro"],
+                 font=FUENTES["titulo_app"]).pack(side="left", padx=20, pady=8)
+        tk.Label(barra, text="Scrap & Rezagos S.R.L.",
+                 bg=COLORES["header"], fg=COLORES["texto_claro"],
+                 font=FUENTES["valor_medio"]).pack(side="right", padx=20)
 
-        titulo = tk.Label(
-            barra,
-            text="  Simulador  |  Scrap y Rezagos S.R.L.",
-            bg=COLORES["panel"],
-            fg=COLORES["texto"],
-            font=("Segoe UI", 14, "bold"),
-            anchor="w",
-        )
-        titulo.pack(side="left", padx=16, pady=10)
+    def _cuerpo(self):
+        cuerpo = tk.Frame(self.root, bg=COLORES["fondo"])
+        cuerpo.pack(fill="both", expand=True, padx=10, pady=10)
 
-        subtitulo = tk.Label(
-            barra,
-            text="UTN FRT - Simulacion - 4K2",
-            bg=COLORES["panel"],
-            fg=COLORES["subtexto"],
-            font=("Segoe UI", 10),
-        )
-        subtitulo.pack(side="right", padx=20)
+        # Columna izquierda (ancho fijo)
+        self.panel_param = PanelParametros(cuerpo, al_iniciar=self._ejecutar_simulacion)
+        self.panel_param.pack(side="left", fill="y")
+        self.panel_param.configure(width=MEDIDAS["ancho_param"])
+        self.panel_param.pack_propagate(False)
 
-    def _contenido_bienvenida(self):
-        frame = tk.Frame(self.root, bg=COLORES["fondo"])
-        frame.pack(expand=True, fill="both", padx=40, pady=30)
+        # Columna central (se estira)
+        self.panel_flujo = PanelFlujo(cuerpo)
+        self.panel_flujo.pack(side="left", fill="both", expand=True, padx=10)
 
-        # Titulo central
-        tk.Label(
-            frame,
-            text="Simulacion de Clasificacion ",
-            bg=COLORES["fondo"],
-            fg=COLORES["texto"],
-            font=("Segoe UI", 20, "bold"),
-            wraplength=700,
-            justify="center",
-        ).pack(pady=(20, 8))
-
-        tk.Label(
-            frame,
-            text="Modelado de eventos discretos con SimPy",
-            bg=COLORES["fondo"],
-            fg=COLORES["subtexto"],
-            font=("Segoe UI", 12),
-        ).pack(pady=(0, 30))
-
-        # Tarjetas de canales
-        self._tarjetas_canales(frame)
-
-        # Boton principal
-        btn = tk.Button(
-            frame,
-            text=" Inicio ",
-            bg=COLORES["acento"],
-            fg="white",
-            font=("Segoe UI", 13, "bold"),
-            relief="flat",
-            cursor="hand2",
-            padx=24,
-            pady=10,
-            command=self._abrir_simulador,
-        )
-        btn.pack(pady=30)
-
-        btn.bind("<Enter>", lambda e: btn.config(bg=COLORES["acento_hover"]))
-        btn.bind("<Leave>", lambda e: btn.config(bg=COLORES["acento"]))
-
-    def _tarjetas_canales(self, parent):
-        """Muestra los 3 canales de salida del sistema."""
-        contenedor = tk.Frame(parent, bg=COLORES["fondo"])
-        contenedor.pack()
-
-        canales = [
-            ("Reventa",   COLORES["rojo"],  "Dispositivos funcionales\ncon valor comercial"),
-            ("Reciclaje", COLORES["verde"], "Desmantelamiento para\nrecuperacion de materiales"),
-            ("Desecho",   COLORES["gris"],  "Disposicion final de\ncomponentes peligrosos"),
-        ]
-
-        for nombre, color, desc in canales:
-            card = tk.Frame(
-                contenedor,
-                bg=COLORES["panel"],
-                width=220,
-                height=120,
-                relief="flat",
-                bd=0,
-            )
-            card.pack(side="left", padx=14, pady=4)
-            card.pack_propagate(False)
-
-            # Franja de color superior
-            tk.Frame(card, bg=color, height=5).pack(fill="x")
-
-            tk.Label(
-                card,
-                text=nombre,
-                bg=COLORES["panel"],
-                fg=color,
-                font=("Segoe UI", 13, "bold"),
-            ).pack(pady=(8, 2))
-
-            tk.Label(
-                card,
-                text=desc,
-                bg=COLORES["panel"],
-                fg=COLORES["subtexto"],
-                font=("Segoe UI", 9),
-                justify="center",
-            ).pack()
-
-    def _barra_inferior(self):
-        barra = tk.Frame(self.root, bg=COLORES["panel"], height=30)
-        barra.pack(fill="x", side="bottom")
-        barra.pack_propagate(False)
-
-        tk.Label(
-            barra,
-            text="Ammiraglia  -  Bazan  -  Figueroa  -  Lazarte  -  Moeykens  -  Munoz",
-            bg=COLORES["panel"],
-            fg=COLORES["subtexto"],
-            font=("Segoe UI", 8),
-        ).pack(expand=True)
+        # Columna derecha (ancho fijo)
+        self.panel_result = PanelResultados(cuerpo)
+        self.panel_result.pack(side="left", fill="y")
+        self.panel_result.configure(width=MEDIDAS["ancho_result"])
+        self.panel_result.pack_propagate(False)
 
     # ----------------------------------------------------------
-    #  Acciones
+    #  Conexion GUI <-> simulacion
     # ----------------------------------------------------------
-
-    def _abrir_simulador(self):
-        """Placeholder: en el proximo avance abre la pantalla de parametros."""
-        ventana = tk.Toplevel(self.root)
-        ventana.title("Proximamente...")
-        ventana.geometry("400x150")
-        ventana.configure(bg=COLORES["fondo"])
-        tk.Label(
-            ventana,
-            text="Pantalla de parametros\nen construccion (Avance 2)",
-            bg=COLORES["fondo"],
-            fg=COLORES["texto"],
-            font=("Segoe UI", 13),
-        ).pack(expand=True)
+    def _ejecutar_simulacion(self, valores):
+        """
+        Se llama al apretar 'Iniciar Simulacion'.
+        En el proximo avance: aca se crea el modelo SimPy con
+        'valores', se corre, y se reparten los resultados a los
+        paneles con .actualizar(...).
+        Por ahora muestra los parametros elegidos en consola.
+        """
+        print("Parametros elegidos:", valores)
