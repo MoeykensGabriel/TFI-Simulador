@@ -11,7 +11,7 @@
 
 import tkinter as tk
 from src.gui.tema import COLORES, FUENTES
-from src.gui.componentes import titulo_panel, campo_parametro
+from src.gui.componentes import titulo_panel, campo_parametro, campo_rango
 
 
 class PanelParametros(tk.Frame):
@@ -24,10 +24,12 @@ class PanelParametros(tk.Frame):
         titulo_panel(self, "PARAMETROS")
 
         # Cada campo devuelve una variable que luego leemos con .get()
-        self.tea       = campo_parametro(self, "TEA Promedio",         [4, 5, 6, 7, 8], 6)
-        self.lote      = campo_parametro(self, "Tamano de Lote",       [100, 150, 200, 250], 200)
-        self.operarios = campo_parametro(self, "Cantidad de Operarios", [3, 4, 5], 5)
-        self.error     = campo_parametro(self, "Error de Clasificacion", ["2 %", "3 %", "4 %", "5 %"], "3 %")
+        self.lotes_min, self.lotes_max = campo_rango(
+            self, "Lotes por semana", range(3, 8), range(3, 8), 3, 7
+        )
+        self.lote      = campo_parametro(self, "Peso por lote (kg)",    [350, 400, 450, 500, 550], 450)
+        self.operarios = campo_parametro(self, "Cantidad de Operarios", [3, 4, 5], 3)
+        self.semanas   = campo_parametro(self, "Semanas de simulacion", [1, 2, 3, 4], 4)
 
         # Boton de accion
         btn = tk.Button(
@@ -42,10 +44,11 @@ class PanelParametros(tk.Frame):
     def obtener_valores(self):
         """Devuelve un diccionario con lo que eligio el usuario."""
         return {
-            "tea":       int(self.tea.get()),
-            "lote":      int(self.lote.get()),
+            "lotes_min": int(self.lotes_min.get()),
+            "lotes_max": int(self.lotes_max.get()),
+            "peso_lote": int(self.lote.get()),
             "operarios": int(self.operarios.get()),
-            "error":     int(self.error.get().replace("%", "").strip()),
+            "semanas":   int(self.semanas.get()),
         }
 
     def _iniciar(self):

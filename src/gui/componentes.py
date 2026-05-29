@@ -54,6 +54,40 @@ def campo_parametro(parent, etiqueta, opciones, valor_inicial):
     return variable
 
 
+def campo_rango(parent, etiqueta, opciones_min, opciones_max, valor_min, valor_max):
+    """
+    Una etiqueta + dos dropdowns (Min y Max) en el mismo renglon.
+    Devuelve dos variables: (var_min, var_max).
+    """
+    tk.Label(
+        parent,
+        text=etiqueta,
+        bg=parent["bg"],
+        fg=COLORES["texto"],
+        font=FUENTES["etiqueta"],
+        anchor="w",
+    ).pack(fill="x", pady=(8, 2))
+
+    fila = tk.Frame(parent, bg=parent["bg"])
+    fila.pack(fill="x")
+
+    # Min
+    tk.Label(fila, text="Min", bg=parent["bg"], fg=COLORES["subtexto"],
+             font=FUENTES["texto_normal"]).pack(side="left")
+    var_min = tk.StringVar(value=str(valor_min))
+    ttk.Combobox(fila, textvariable=var_min, values=[str(o) for o in opciones_min],
+                 state="readonly", font=FUENTES["texto_normal"], width=4).pack(side="left", padx=(2, 10))
+
+    # Max
+    tk.Label(fila, text="Max", bg=parent["bg"], fg=COLORES["subtexto"],
+             font=FUENTES["texto_normal"]).pack(side="left")
+    var_max = tk.StringVar(value=str(valor_max))
+    ttk.Combobox(fila, textvariable=var_max, values=[str(o) for o in opciones_max],
+                 state="readonly", font=FUENTES["texto_normal"], width=4).pack(side="left", padx=(2, 0))
+
+    return var_min, var_max
+
+
 def tarjeta_canal(parent, nombre, color, valor="0"):
     """
     Tarjeta de color de un canal de salida (Venta/Reciclaje/Desecho)
