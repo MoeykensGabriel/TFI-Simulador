@@ -36,6 +36,7 @@ class PanelParametros(tk.Frame):
         scrollbar = ttk.Scrollbar(self, orient="vertical", command=canvas.yview)
         canvas.configure(yscrollcommand=scrollbar.set)
 
+<<<<<<< HEAD
         scrollbar.pack(side="right", fill="y")
         canvas.pack(side="left", fill="both", expand=True)
 
@@ -67,6 +68,13 @@ class PanelParametros(tk.Frame):
         self.lotes_min, self.lotes_max = campo_rango(
             parent, "Lotes por semana", range(3, 8), range(3, 8), 3, 7
         )
+=======
+        # Cada campo devuelve una variable que luego leemos con .get()
+        self.tea       = campo_parametro(self, "TEA Promedio",         [4, 5, 6, 7, 8], 6)
+        self.lote      = campo_parametro(self, "Tamano de Lote",       [100, 150, 200, 250], 200)
+        self.operarios = campo_parametro(self, "Cantidad de Operarios", [3, 4, 5], 5)
+        self.error     = campo_parametro(self, "Error de Clasificacion", ["2 %", "3 %", "4 %", "5 %"], "3 %")
+>>>>>>> 486d46ede557e0ebffdde3eb2a52f28020ca5389
 
         # --- Tamano de lote (Media / Desviacion en el mismo renglon) ---
         self.lote_media, self.lote_desv = campo_rango(
@@ -108,6 +116,7 @@ class PanelParametros(tk.Frame):
     def obtener_valores(self):
         """Devuelve un diccionario con todos los valores elegidos por el usuario."""
         return {
+<<<<<<< HEAD
             "lotes_min":      int(self.lotes_min.get()),
             "lotes_max":      int(self.lotes_max.get()),
             "lote_media":     int(self.lote_media.get()),
@@ -120,6 +129,12 @@ class PanelParametros(tk.Frame):
             "operarios":      int(self.operarios.get()),
             "salario":        int(self.salario.get()) * 1000,
             "semanas":        int(self.semanas.get()),
+=======
+            "tea":       int(self.tea.get()),
+            "lote":      int(self.lote.get()),
+            "operarios": int(self.operarios.get()),
+            "error":     int(self.error.get().replace("%", "").strip()),
+>>>>>>> 486d46ede557e0ebffdde3eb2a52f28020ca5389
         }
 
     def _iniciar(self):
