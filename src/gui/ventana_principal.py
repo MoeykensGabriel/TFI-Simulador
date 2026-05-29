@@ -40,11 +40,11 @@ class VentanaPrincipal:
         barra.pack(fill="x")
         barra.pack_propagate(False)
         tk.Label(barra, text="SIMULADOR DE CLASIFICACION DE RAEE",
-                 bg=COLORES["header"], fg=COLORES["texto_claro"],
-                 font=FUENTES["titulo_app"]).pack(side="left", padx=20, pady=8)
+        bg=COLORES["header"], fg=COLORES["texto_claro"],
+        font=FUENTES["titulo_app"]).pack(side="left", padx=20, pady=8)
         tk.Label(barra, text="Scrap & Rezagos S.R.L.",
-                 bg=COLORES["header"], fg=COLORES["texto_claro"],
-                 font=FUENTES["valor_medio"]).pack(side="right", padx=20)
+        bg=COLORES["header"], fg=COLORES["texto_claro"],
+        font=FUENTES["valor_medio"]).pack(side="right", padx=20)
 
     def _cuerpo(self):
         cuerpo = tk.Frame(self.root, bg=COLORES["fondo"])
