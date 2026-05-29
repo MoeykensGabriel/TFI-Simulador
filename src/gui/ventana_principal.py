@@ -33,7 +33,7 @@ class VentanaPrincipal:
         x = (self.root.winfo_screenwidth()  - ancho) // 2
         y = (self.root.winfo_screenheight() - alto)  // 2
         self.root.geometry(f"{ancho}x{alto}+{x}+{y}")
-        self.root.minsize(1000, 520)
+        self.root.minsize(1100, 620)
 
     def _header(self):
         barra = tk.Frame(self.root, bg=COLORES["header"], height=60)
