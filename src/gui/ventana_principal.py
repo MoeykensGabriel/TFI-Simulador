@@ -34,7 +34,7 @@ class VentanaPrincipal:
     # ----------------------------------------------------------
 
     def _configurar_ventana(self):
-        self.root.title("Simulador E-Waste | Scrap y Rezagos S.R.L.")
+        self.root.title("Simulador | Scrap y Rezagos S.R.L.")
         self.root.geometry("1100x700")
         self.root.minsize(900, 600)
         self.root.configure(bg=COLORES["fondo"])
@@ -60,7 +60,7 @@ class VentanaPrincipal:
 
         titulo = tk.Label(
             barra,
-            text="  Simulador E-Waste  |  Scrap y Rezagos S.R.L.",
+            text="  Simulador  |  Scrap y Rezagos S.R.L.",
             bg=COLORES["panel"],
             fg=COLORES["texto"],
             font=("Segoe UI", 14, "bold"),
@@ -84,7 +84,7 @@ class VentanaPrincipal:
         # Titulo central
         tk.Label(
             frame,
-            text="Simulacion de Clasificacion de Residuos Electronicos",
+            text="Simulacion de Clasificacion ",
             bg=COLORES["fondo"],
             fg=COLORES["texto"],
             font=("Segoe UI", 20, "bold"),
@@ -106,7 +106,7 @@ class VentanaPrincipal:
         # Boton principal
         btn = tk.Button(
             frame,
-            text="  Iniciar Simulador  ",
+            text=" Inicio ",
             bg=COLORES["acento"],
             fg="white",
             font=("Segoe UI", 13, "bold"),
@@ -171,7 +171,7 @@ class VentanaPrincipal:
 
         tk.Label(
             barra,
-            text="Grupo N1  |  Ammiraglia  -  Bazan  -  Figueroa  -  Lazarte  -  Moeykens  -  Munoz",
+            text="Ammiraglia  -  Bazan  -  Figueroa  -  Lazarte  -  Moeykens  -  Munoz",
             bg=COLORES["panel"],
             fg=COLORES["subtexto"],
             font=("Segoe UI", 8),
