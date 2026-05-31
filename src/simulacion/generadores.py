@@ -54,3 +54,33 @@ def generar_peso_lote(p: Parametros) -> float:
 def generar_cant_lotes(p: Parametros) -> int:
     """Cantidad de lotes de la semana, entero entre lotes_min y lotes_max."""
     return random.randint(int(p.lotes_semanales_A), int(p.lotes_semanales_B))
+
+
+def generar_lote(p: Parametros) -> list:
+    """
+    Genera UN lote completo (loop SP <= PL del DFD):
+      1. Sortea el peso del lote PL ~ Normal(450, 100).
+      2. Va generando dispositivos y acumulando su peso SP
+         hasta que SP alcanza PL.
+    Devuelve la lista de Dispositivos que componen el lote.
+    """
+    peso_objetivo = generar_peso_lote(p)   # PL
+    peso_acumulado = 0.0                    # SP
+    dispositivos = []
+
+    while peso_acumulado <= peso_objetivo:
+        d = generar_dispositivo(p)
+        dispositivos.append(d)
+        peso_acumulado += d.peso            # SP = SP + PD
+
+    return dispositivos
+
+
+def generar_semana(p: Parametros) -> list:
+    """
+    Genera una semana completa: L lotes (entre min y max), cada uno
+    desagregado en dispositivos. Devuelve la lista de lotes,
+    donde cada lote es una lista de Dispositivos.
+    """
+    cantidad = generar_cant_lotes(p)        # L
+    return [generar_lote(p) for _ in range(cantidad)]
