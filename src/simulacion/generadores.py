@@ -23,6 +23,10 @@ class Dispositivo:
     moderno: bool    # True si es de tecnologia moderna
     peso: float      # kg
 
+    # Se completan en la etapa de clasificacion:
+    canal: str = None          # "reventa" | "reciclaje" | "desecho"
+    mal_clasificado: bool = False  # True si era reventa y fue a desecho por error
+
 
 def generar_dispositivo(p: Parametros) -> Dispositivo:
     """
