@@ -71,31 +71,45 @@ class VentanaPrincipal:
     # ----------------------------------------------------------
     #  Conexion GUI <-> simulacion
     # ----------------------------------------------------------
+    # Milisegundos de pausa entre una semana y la siguiente (animacion)
+    PAUSA_SEMANA = 700
+
     def _ejecutar_simulacion(self, valores):
         """
         Se llama al apretar 'Iniciar Simulacion'.
-        Crea los parametros desde la GUI, corre el modelo y reparte
-        los resultados a los paneles de flujo y resultados.
+        Arranca la simulacion en modo 'semana a semana': procesa una
+        semana, refresca la pantalla, y agenda la siguiente con un
+        pequeño retraso para que se vea el avance en tiempo real.
         """
-        # 1) Construir parametros con lo elegido por el usuario
         p = Parametros.desde_gui(valores)
+        self.modelo = ModeloSimulacion(p)
+        self.semana_actual = 0
+        self.total_semanas = p.semanas_simulacion
+        self._procesar_semana()
 
-        # 2) Correr la simulacion
-        resultados = ModeloSimulacion(p).correr()
+    def _procesar_semana(self):
+        """Procesa una semana, actualiza los paneles y agenda la siguiente."""
+        if self.semana_actual >= self.total_semanas:
+            return  # simulacion terminada
 
-        # 3) Mostrar los conteos en el panel central (flujo)
+        self.semana_actual += 1
+        r = self.modelo.correr_semana()   # acumula una semana mas
+
+        # Refrescar el panel central con los acumulados hasta ahora
         self.panel_flujo.actualizar(
-            entrada=resultados.total_procesados,
-            clasificados=resultados.total_procesados,
-            venta=resultados.a_venta,
-            reciclaje=resultados.a_reciclaje,
-            desecho=resultados.a_desecho,
+            entrada=r.total_procesados,
+            clasificados=r.total_procesados,
+            venta=r.a_venta,
+            reciclaje=r.a_reciclaje,
+            desecho=r.a_desecho,
         )
 
-        # 4) Mostrar metricas en el panel derecho (rentabilidad y espera
-        #    quedan en 0 hasta implementar dinero y teoria de colas)
+        # Refrescar metricas (rentabilidad y espera quedan en 0 por ahora)
         self.panel_result.actualizar(
-            total=resultados.total_procesados,
+            total=r.total_procesados,
             espera_min=0,
             rentabilidad=0,
         )
+
+        # Agendar la proxima semana sin congelar la ventana
+        self.root.after(self.PAUSA_SEMANA, self._procesar_semana)

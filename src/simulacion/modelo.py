@@ -6,6 +6,9 @@
 #    genera semanas -> desagrega lotes -> clasifica dispositivos
 #    -> acumula los totales en Resultados.
 #
+#  Se puede correr completo (correr) o avanzar semana a semana
+#  (correr_semana), que es lo que usa la GUI para animar.
+#
 #  La parte de Teoria de Colas (SimPy: tiempos de espera,
 #  utilizacion) se agrega en un paso posterior.
 # ============================================================
@@ -21,24 +24,28 @@ class ModeloSimulacion:
         self.p = parametros
         self.resultados = Resultados()
 
-    def correr(self) -> Resultados:
+    def correr_semana(self) -> Resultados:
         """
-        Corre la simulacion completa (semana a semana) y devuelve
-        los resultados con los conteos por canal.
+        Procesa UNA semana: genera sus lotes, desagrega y clasifica
+        cada dispositivo, y acumula los totales en self.resultados.
+        Devuelve los resultados parciales (acumulados hasta ahora).
         """
         r = self.resultados
-
-        for _ in range(self.p.semanas_simulacion):
-            semana = generar_semana(self.p)          # lista de lotes
-            for lote in semana:
-                for d in lote:
-                    clasificar(d, self.p)            # asigna canal
-                    r.total_procesados += 1
-                    if d.canal == "reventa":
-                        r.a_venta += 1
-                    elif d.canal == "reciclaje":
-                        r.a_reciclaje += 1
-                    else:
-                        r.a_desecho += 1
-
+        semana = generar_semana(self.p)
+        for lote in semana:
+            for d in lote:
+                clasificar(d, self.p)
+                r.total_procesados += 1
+                if d.canal == "reventa":
+                    r.a_venta += 1
+                elif d.canal == "reciclaje":
+                    r.a_reciclaje += 1
+                else:
+                    r.a_desecho += 1
         return r
+
+    def correr(self) -> Resultados:
+        """Corre la simulacion completa (todas las semanas de una)."""
+        for _ in range(self.p.semanas_simulacion):
+            self.correr_semana()
+        return self.resultados
