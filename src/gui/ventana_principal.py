@@ -16,6 +16,8 @@ from src.gui.tema import COLORES, FUENTES, MEDIDAS
 from src.gui.panel_parametros import PanelParametros
 from src.gui.panel_flujo import PanelFlujo
 from src.gui.panel_resultados import PanelResultados
+from src.simulacion.parametros import Parametros
+from src.simulacion.modelo import ModeloSimulacion
 
 
 class VentanaPrincipal:
@@ -72,9 +74,28 @@ class VentanaPrincipal:
     def _ejecutar_simulacion(self, valores):
         """
         Se llama al apretar 'Iniciar Simulacion'.
-        En el proximo avance: aca se crea el modelo SimPy con
-        'valores', se corre, y se reparten los resultados a los
-        paneles con .actualizar(...).
-        Por ahora muestra los parametros elegidos en consola.
+        Crea los parametros desde la GUI, corre el modelo y reparte
+        los resultados a los paneles de flujo y resultados.
         """
-        print("Parametros elegidos:", valores)
+        # 1) Construir parametros con lo elegido por el usuario
+        p = Parametros.desde_gui(valores)
+
+        # 2) Correr la simulacion
+        resultados = ModeloSimulacion(p).correr()
+
+        # 3) Mostrar los conteos en el panel central (flujo)
+        self.panel_flujo.actualizar(
+            entrada=resultados.total_procesados,
+            clasificados=resultados.total_procesados,
+            venta=resultados.a_venta,
+            reciclaje=resultados.a_reciclaje,
+            desecho=resultados.a_desecho,
+        )
+
+        # 4) Mostrar metricas en el panel derecho (rentabilidad y espera
+        #    quedan en 0 hasta implementar dinero y teoria de colas)
+        self.panel_result.actualizar(
+            total=resultados.total_procesados,
+            espera_min=0,
+            rentabilidad=0,
+        )

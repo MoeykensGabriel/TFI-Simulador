@@ -1,45 +1,44 @@
 # ============================================================
-#  modelo.py  -  Motor de simulacion (SimPy)
+#  modelo.py  -  Motor de simulacion
 # ------------------------------------------------------------
-#  AQUI VA: el corazon del simulador. Define los procesos de
-#  eventos discretos con SimPy:
-#    - llegada de lotes (segun el TEA y distribuciones de prob.)
-#    - cola hacia la mesa de clasificacion (recurso = operarios)
-#    - clasificacion y derivacion a cada canal (con su % de error)
+#  AQUI VA: la orquestacion de una corrida completa. Por ahora
+#  ejecuta el "modelo matematico" (conteo del DFD):
+#    genera semanas -> desagrega lotes -> clasifica dispositivos
+#    -> acumula los totales en Resultados.
 #
-#  Lee un objeto Parametros y va llenando un objeto Resultados.
-#  NO contiene nada visual.
-#
-#  ESTADO: esqueleto. La logica completa se desarrolla en el
-#  proximo avance, paso a paso.
+#  La parte de Teoria de Colas (SimPy: tiempos de espera,
+#  utilizacion) se agrega en un paso posterior.
 # ============================================================
 
-import simpy
 from src.simulacion.parametros import Parametros
 from src.simulacion.resultados import Resultados
+from src.simulacion.generadores import generar_semana
+from src.simulacion.clasificador import clasificar
 
 
 class ModeloSimulacion:
     def __init__(self, parametros: Parametros):
         self.p = parametros
         self.resultados = Resultados()
-        self.env = simpy.Environment()
-        # La mesa de clasificacion como recurso limitado por la
-        # cantidad de operarios disponibles.
-        self.mesa = simpy.Resource(self.env, capacity=self.p.cantidad_operarios)
 
-    # --- Procesos SimPy (a desarrollar) ---
-    def _generar_lotes(self):
-        """Genera lotes que llegan al muelle segun el TEA. (pendiente)"""
-        raise NotImplementedError
-
-    def _clasificar(self, lote):
-        """Procesa un lote en la mesa y lo deriva a un canal. (pendiente)"""
-        raise NotImplementedError
-
-    # --- Ejecucion ---
     def correr(self) -> Resultados:
-        """Corre la simulacion completa y devuelve los resultados."""
-        # self.env.process(self._generar_lotes())
-        # self.env.run(until=self.p.horas_simulacion)
-        return self.resultados
+        """
+        Corre la simulacion completa (semana a semana) y devuelve
+        los resultados con los conteos por canal.
+        """
+        r = self.resultados
+
+        for _ in range(self.p.semanas_simulacion):
+            semana = generar_semana(self.p)          # lista de lotes
+            for lote in semana:
+                for d in lote:
+                    clasificar(d, self.p)            # asigna canal
+                    r.total_procesados += 1
+                    if d.canal == "reventa":
+                        r.a_venta += 1
+                    elif d.canal == "reciclaje":
+                        r.a_reciclaje += 1
+                    else:
+                        r.a_desecho += 1
+
+        return r
