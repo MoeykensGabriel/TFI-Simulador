@@ -71,28 +71,40 @@ class VentanaPrincipal:
     # ----------------------------------------------------------
     #  Conexion GUI <-> simulacion
     # ----------------------------------------------------------
-    # Milisegundos de pausa entre una semana y la siguiente (animacion)
-    PAUSA_SEMANA = 700
+    # Milisegundos de pausa entre una semana y la siguiente
+    PAUSA_SEMANA = 3000
+    # Cada cuanto parpadean los puntos de la animacion
+    PAUSA_PUNTOS = 400
 
     def _ejecutar_simulacion(self, valores):
         """
         Se llama al apretar 'Iniciar Simulacion'.
         Arranca la simulacion en modo 'semana a semana': procesa una
-        semana, refresca la pantalla, y agenda la siguiente con un
-        pequeño retraso para que se vea el avance en tiempo real.
+        semana, refresca la pantalla, y agenda la siguiente con 3
+        segundos de pausa para que se vea el avance en tiempo real.
         """
         p = Parametros.desde_gui(valores)
         self.modelo = ModeloSimulacion(p)
-        self.semana_actual = 0
         self.total_semanas = p.semanas_simulacion
+        self.semana_actual = 1
+        self.simulando = True
+        self._puntos = 0
+        self._animar_puntos()      # arranca la animacion de puntos
         self._procesar_semana()
+
+    def _animar_puntos(self):
+        """Hace parpadear los puntos del aviso (. .. ...) mientras simula."""
+        if not self.simulando:
+            return
+        self._puntos = (self._puntos + 1) % 4
+        texto = f"Simulando semana {self.semana_actual} de {self.total_semanas}"
+        self.panel_flujo.actualizar_estado(
+            texto + "." * self._puntos, color=COLORES["boton"]
+        )
+        self.root.after(self.PAUSA_PUNTOS, self._animar_puntos)
 
     def _procesar_semana(self):
         """Procesa una semana, actualiza los paneles y agenda la siguiente."""
-        if self.semana_actual >= self.total_semanas:
-            return  # simulacion terminada
-
-        self.semana_actual += 1
         r = self.modelo.correr_semana()   # acumula una semana mas
 
         # Refrescar el panel central con los acumulados hasta ahora
@@ -111,5 +123,18 @@ class VentanaPrincipal:
             rentabilidad=0,
         )
 
-        # Agendar la proxima semana sin congelar la ventana
-        self.root.after(self.PAUSA_SEMANA, self._procesar_semana)
+        # Si era la ultima semana, terminar
+        if self.semana_actual >= self.total_semanas:
+            self.simulando = False
+            self.panel_flujo.actualizar_estado(
+                f"Simulacion finalizada ({self.total_semanas} semanas)",
+                color=COLORES["reciclaje"],
+            )
+            return
+
+        # Agendar la proxima semana: esperar 3s y recien ahi avanzar
+        def siguiente():
+            self.semana_actual += 1
+            self._procesar_semana()
+
+        self.root.after(self.PAUSA_SEMANA, siguiente)

@@ -22,9 +22,17 @@ class PanelFlujo(tk.Frame):
     def _construir(self):
         titulo_panel(self, "FLUJO DE DISPOSITIVOS")
 
+        # --- Aviso de estado (ej: "Simulando semana 1 de 4...") ---
+        self.lbl_estado = tk.Label(
+            self, text="Listo para simular",
+            bg=COLORES["panel_centro"], fg=COLORES["texto"],
+            font=FUENTES["valor_medio"],
+        )
+        self.lbl_estado.pack(pady=(4, 0))
+
         # --- Etapas iniciales (entrada y clasificacion) ---
         fila = tk.Frame(self, bg=COLORES["panel_centro"])
-        fila.pack(pady=20)
+        fila.pack(pady=14)
 
         self.lbl_entrada = self._etapa(fila, "ENTRADA\nDE LOTE", "0")
         self.lbl_clasif  = self._etapa(fila, "CLASIFICACION", "0")
@@ -58,3 +66,7 @@ class PanelFlujo(tk.Frame):
         self.lbl_venta.config(text=str(venta))
         self.lbl_reciclaje.config(text=str(reciclaje))
         self.lbl_desecho.config(text=str(desecho))
+
+    def actualizar_estado(self, texto, color=None):
+        """Refresca el aviso de estado (ej: 'Simulando semana 2 de 4...')."""
+        self.lbl_estado.config(text=texto, fg=color or COLORES["texto"])
