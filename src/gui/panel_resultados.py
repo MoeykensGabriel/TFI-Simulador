@@ -15,8 +15,9 @@ from src.gui.componentes import titulo_panel, metrica
 
 
 class PanelResultados(tk.Frame):
-    def __init__(self, parent):
+    def __init__(self, parent, al_ver_recomendaciones=None):
         super().__init__(parent, bg=COLORES["panel_result"], padx=14, pady=14)
+        self.al_ver_recomendaciones = al_ver_recomendaciones
         self._construir()
 
     def _construir(self):
@@ -26,6 +27,16 @@ class PanelResultados(tk.Frame):
         self.lbl_prom_lote    = metrica(self, "PROMEDIO POR LOTE", "0")
         self.lbl_espera       = metrica(self, "TIEMPO DE ESPERA EN COLA", "0 min.")
         self.lbl_rentabilidad = metrica(self, "RENTABILIDAD ESTIMADA", "$ 0")
+
+        # --- Boton de recomendaciones (oculto hasta terminar la simulacion) ---
+        self.btn_recom = tk.Button(
+            self, text="Ver Recomendaciones", bg=COLORES["boton"],
+            fg="white", font=FUENTES["boton"], relief="flat", cursor="hand2",
+            pady=8, command=self._click_recomendaciones,
+        )
+        self.btn_recom.bind("<Enter>", lambda e: self.btn_recom.config(bg=COLORES["boton_hover"]))
+        self.btn_recom.bind("<Leave>", lambda e: self.btn_recom.config(bg=COLORES["boton"]))
+        # No se hace pack() todavia: aparece solo al finalizar
 
         # --- Espacio reservado para los graficos ---
         # Aqui en el proximo avance se incrustan los canvas de Matplotlib
@@ -44,3 +55,11 @@ class PanelResultados(tk.Frame):
         self.lbl_prom_lote.config(text=f"{promedio_lote:,.0f}".replace(",", "."))
         self.lbl_espera.config(text=f"{espera_min} min.")
         self.lbl_rentabilidad.config(text=f"$ {rentabilidad:,.0f}".replace(",", "."))
+
+    def mostrar_boton_recomendaciones(self):
+        """Hace aparecer el boton (se llama al terminar la simulacion)."""
+        self.btn_recom.pack(fill="x", pady=(20, 0))
+
+    def _click_recomendaciones(self):
+        if self.al_ver_recomendaciones:
+            self.al_ver_recomendaciones()

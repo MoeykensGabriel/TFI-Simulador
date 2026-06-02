@@ -16,8 +16,10 @@ from src.gui.tema import COLORES, FUENTES, MEDIDAS
 from src.gui.panel_parametros import PanelParametros
 from src.gui.panel_flujo import PanelFlujo
 from src.gui.panel_resultados import PanelResultados
+from src.gui.ventana_recomendaciones import VentanaRecomendaciones
 from src.simulacion.parametros import Parametros
 from src.simulacion.modelo import ModeloSimulacion
+from src.simulacion.alternativas import evaluar_alternativas
 
 
 class VentanaPrincipal:
@@ -63,7 +65,7 @@ class VentanaPrincipal:
         self.panel_flujo.pack(side="left", fill="both", expand=True, padx=10)
 
         # Columna derecha (ancho fijo)
-        self.panel_result = PanelResultados(cuerpo)
+        self.panel_result = PanelResultados(cuerpo, al_ver_recomendaciones=self._abrir_recomendaciones)
         self.panel_result.pack(side="left", fill="y")
         self.panel_result.configure(width=MEDIDAS["ancho_result"])
         self.panel_result.pack_propagate(False)
@@ -140,6 +142,9 @@ class VentanaPrincipal:
                 f"Simulacion finalizada ({self.total_semanas} semanas)",
                 color=COLORES["reciclaje"],
             )
+            # Evaluar las 4 alternativas y habilitar el boton de recomendaciones
+            self.alternativas = evaluar_alternativas(r, self.modelo.p)
+            self.panel_result.mostrar_boton_recomendaciones()
             return
 
         # Agendar la proxima semana: esperar 3s y recien ahi avanzar
@@ -148,3 +153,8 @@ class VentanaPrincipal:
             self._procesar_semana()
 
         self.root.after(self.PAUSA_SEMANA, siguiente)
+
+    def _abrir_recomendaciones(self):
+        """Abre la ventana con el diagnostico de las 4 alternativas."""
+        if hasattr(self, "alternativas"):
+            VentanaRecomendaciones(self.root, self.alternativas)

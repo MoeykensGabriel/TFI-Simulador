@@ -22,6 +22,7 @@ class Resultados:
     a_reciclaje: int = 0
     a_desecho: int = 0
     mal_clasificados: int = 0     # reventa que terminaron en desecho
+    modernos: int = 0             # dispositivos de tecnologia moderna
 
     # --- Dinero (ARS) ---
     ganancia_reventa: float = 0.0     # GTR: por dispositivos vendidos
@@ -53,6 +54,18 @@ class Resultados:
         if self.total_lotes == 0:
             return 0.0
         return self.total_procesados / self.total_lotes
+
+    @property
+    def porcentaje_modernos(self) -> float:
+        """Fraccion de dispositivos modernos (0 a 1)."""
+        if self.total_procesados == 0:
+            return 0.0
+        return self.modernos / self.total_procesados
+
+    @property
+    def ingresos_brutos(self) -> float:
+        """Ingresos antes de costos (reventa + materiales)."""
+        return self.ganancia_reventa + self.ganancia_materiales
 
     def espera_promedio(self) -> float:
         if not self.tiempos_espera:

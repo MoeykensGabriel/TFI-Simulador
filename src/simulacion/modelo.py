@@ -39,6 +39,8 @@ class ModeloSimulacion:
             for d in lote:
                 clasificar(d, self.p)
                 r.total_procesados += 1
+                if d.moderno:
+                    r.modernos += 1
 
                 if d.canal == "reventa":
                     r.a_venta += 1
