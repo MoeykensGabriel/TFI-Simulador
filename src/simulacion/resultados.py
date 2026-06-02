@@ -28,6 +28,12 @@ class Resultados:
     perdida_clasificacion: float = 0.0  # valor de reventa perdido por error
     costo_operativo: float = 0.0      # salarios de los operarios
 
+    # --- Teoria de colas (mesa M/M/c) ---
+    wq_min: float = 0.0           # tiempo medio de espera en cola (min)
+    lq: float = 0.0               # largo medio de la cola (dispositivos)
+    utilizacion: float = 0.0      # utilizacion de operarios (0 a 1)
+    max_cola: int = 0             # cola maxima observada
+
     # --- Series para graficos ---
     serie_arribos: list = field(default_factory=list)
     serie_ocupacion: list = field(default_factory=list)

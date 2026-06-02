@@ -116,16 +116,23 @@ class VentanaPrincipal:
             desecho=r.a_desecho,
         )
 
-        # Refrescar metricas (espera queda en 0 hasta implementar colas)
+        # Refrescar metricas (la espera se calcula al final, con las colas)
         self.panel_result.actualizar(
             total=r.total_procesados,
-            espera_min=0,
+            espera_min=round(r.wq_min),
             rentabilidad=r.ganancia_neta,
         )
 
         # Si era la ultima semana, terminar
         if self.semana_actual >= self.total_semanas:
             self.simulando = False
+            # Correr la teoria de colas (M/M/c) y refrescar la espera real
+            self.modelo.calcular_colas()
+            self.panel_result.actualizar(
+                total=r.total_procesados,
+                espera_min=round(r.wq_min),
+                rentabilidad=r.ganancia_neta,
+            )
             self.panel_flujo.actualizar_estado(
                 f"Simulacion finalizada ({self.total_semanas} semanas)",
                 color=COLORES["reciclaje"],

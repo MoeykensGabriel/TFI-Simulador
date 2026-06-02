@@ -38,6 +38,12 @@ class Parametros:
     cantidad_operarios: int = 3       # operarios en la mesa de clasificacion
     error_clasificacion: float = 0.03 # 3% de error (reventa -> desecho)
 
+    # --- Teoria de colas (mesa de clasificacion M/M/c) ---
+    tiempo_servicio_min: float = 1.0  # min, servicio por dispositivo UNIF(1,3)
+    tiempo_servicio_max: float = 3.0
+    horas_dia: int = 8                # jornada: horas por dia
+    dias_semana_laboral: int = 5      # jornada: dias por semana
+
     # --- Probabilidades de canal (acumuladas: 0.37 / 0.83 / 1.00) ---
     prop_venta: float = 0.37
     prop_reciclaje: float = 0.46
@@ -63,6 +69,10 @@ class Parametros:
 
     # --- Duracion de la simulacion ---
     semanas_simulacion: int = 4        # 4 a 12 semanas
+
+    def minutos_periodo(self) -> float:
+        """Minutos laborables totales del periodo simulado."""
+        return self.semanas_simulacion * self.dias_semana_laboral * self.horas_dia * 60
 
     @classmethod
     def desde_gui(cls, valores: dict) -> "Parametros":
