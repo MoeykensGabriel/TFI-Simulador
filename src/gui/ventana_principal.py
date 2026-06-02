@@ -122,7 +122,6 @@ class VentanaPrincipal:
             espera_min=round(r.wq_min),
             rentabilidad=r.ganancia_neta,
             promedio_lote=r.promedio_por_lote,
-            ocupacion=r.ocupacion_deposito,
         )
 
         # Si era la ultima semana, terminar
@@ -135,8 +134,8 @@ class VentanaPrincipal:
                 espera_min=round(r.wq_min),
                 rentabilidad=r.ganancia_neta,
                 promedio_lote=r.promedio_por_lote,
-                ocupacion=r.ocupacion_deposito,
             )
+            self.panel_flujo.actualizar_deposito(r.ocupacion_deposito)
             self.panel_flujo.actualizar_estado(
                 f"Simulacion finalizada ({self.total_semanas} semanas)",
                 color=COLORES["reciclaje"],
