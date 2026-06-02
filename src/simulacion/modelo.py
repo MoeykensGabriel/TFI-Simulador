@@ -15,7 +15,7 @@
 
 from src.simulacion.parametros import Parametros
 from src.simulacion.resultados import Resultados
-from src.simulacion.generadores import generar_semana
+from src.simulacion.generadores import generar_lote_semana
 from src.simulacion.clasificador import clasificar
 from src.simulacion.calculadora import valor_reventa, valor_materiales, costo_operarios
 from src.simulacion.colas import simular_colas
@@ -33,7 +33,7 @@ class ModeloSimulacion:
         Devuelve los resultados parciales (acumulados hasta ahora).
         """
         r = self.resultados
-        semana = generar_semana(self.p)
+        semana = generar_lote_semana(self.p)
         r.total_lotes += len(semana)
         for lote in semana:
             for d in lote:

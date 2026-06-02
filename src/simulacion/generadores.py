@@ -31,8 +31,8 @@ class Dispositivo:
 def generar_dispositivo(p: Parametros) -> Dispositivo:
     """
     Genera UN dispositivo segun el DFD:
-      u <= prop_celular -> celular (peso 0.14 + 0.16u)
-      u >  prop_celular -> tablet  (peso 0.30 + 0.40u)
+    u <= prop_celular -> celular (peso 0.14 + 0.16u)
+    u >  prop_celular -> tablet  (peso 0.30 + 0.40u)
     Luego decide si es moderno (prop_moderno) y calcula su peso.
     """
     # 1) Tipo de dispositivo
@@ -63,9 +63,9 @@ def generar_cant_lotes(p: Parametros) -> int:
 def generar_lote(p: Parametros) -> list:
     """
     Genera UN lote completo (loop SP <= PL del DFD):
-      1. Sortea el peso del lote PL ~ Normal(450, 100).
-      2. Va generando dispositivos y acumulando su peso SP
-         hasta que SP alcanza PL.
+    1. Sortea el peso del lote PL ~ Normal(450, 100).
+    2. Va generando dispositivos y acumulando su peso SP
+    hasta que SP alcanza PL.
     Devuelve la lista de Dispositivos que componen el lote.
     """
     peso_objetivo = generar_peso_lote(p)   # PL
@@ -80,7 +80,7 @@ def generar_lote(p: Parametros) -> list:
     return dispositivos
 
 
-def generar_semana(p: Parametros) -> list:
+def generar_lote_semana(p: Parametros) -> list:
     """
     Genera una semana completa: L lotes (entre min y max), cada uno
     desagregado en dispositivos. Devuelve la lista de lotes,

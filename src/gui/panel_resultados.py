@@ -45,9 +45,9 @@ class PanelResultados(tk.Frame):
         self.contenedor_graficos = tk.Frame(self, bg=COLORES["panel_result"])
         self.contenedor_graficos.pack(fill="both", expand=True, pady=(14, 0))
         tk.Label(self.contenedor_graficos,
-                 text="[ graficos: tasa de arribos\n y ocupacion deposito ]",
-                 bg=COLORES["panel_result"], fg=COLORES["subtexto"],
-                 font=FUENTES["texto_normal"]).pack(expand=True)
+                    text="[ graficos: tasa de arribos\n y ocupacion deposito ]",
+                    bg=COLORES["panel_result"], fg=COLORES["subtexto"],
+                    font=FUENTES["texto_normal"]).pack(expand=True)
 
     def actualizar(self, total, espera_min, rentabilidad, promedio_lote=0):
         """La simulacion llama a esto al terminar para mostrar los resultados."""
@@ -57,8 +57,10 @@ class PanelResultados(tk.Frame):
         self.lbl_rentabilidad.config(text=f"$ {rentabilidad:,.0f}".replace(",", "."))
 
     def mostrar_boton_recomendaciones(self):
-        """Hace aparecer el boton (se llama al terminar la simulacion)."""
         self.btn_recom.pack(fill="x", pady=(20, 0))
+
+    def esconder_boton_recomendaciones(self):
+        self.btn_recom.pack_forget()
 
     def _click_recomendaciones(self):
         if self.al_ver_recomendaciones:

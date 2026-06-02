@@ -60,16 +60,16 @@ class PanelFlujo(tk.Frame):
         cabecera = tk.Frame(self.card_dep, bg=COLORES["reciclaje"])
         cabecera.pack(pady=(10, 0))
         self.lbl_dep_icono = tk.Label(cabecera, text="\U0001F4E6", bg=COLORES["reciclaje"],
-                                      fg="white", font=("Segoe UI Emoji", 16))
+                                        fg="white", font=("Segoe UI Emoji", 16))
         self.lbl_dep_icono.pack(side="left", padx=(0, 6))
         self.lbl_dep_titulo = tk.Label(cabecera, text="OCUPACION DEPOSITO",
-                                       bg=COLORES["reciclaje"], fg="white",
-                                       font=FUENTES["texto_normal"])
+                                        bg=COLORES["reciclaje"], fg="white",
+                                        font=FUENTES["texto_normal"])
         self.lbl_dep_titulo.pack(side="left")
 
         # Porcentaje grande
-        self.lbl_dep_valor = tk.Label(self.card_dep, text="0 %", bg=COLORES["reciclaje"],
-                                      fg="white", font=FUENTES["valor_grande"])
+        self.lbl_dep_valor = tk.Label(self.card_dep, text="0%", bg=COLORES["reciclaje"],
+                                        fg="white", font=FUENTES["valor_grande"])
         self.lbl_dep_valor.pack()
 
     def _etapa(self, parent, nombre, valor):
@@ -78,9 +78,9 @@ class PanelFlujo(tk.Frame):
         caja.pack(side="left", padx=18)
         caja.pack_propagate(False)
         tk.Label(caja, text=nombre, bg=COLORES["tarjeta"], fg=COLORES["texto"],
-                 font=FUENTES["texto_normal"]).pack(pady=(10, 4))
+                    font=FUENTES["texto_normal"]).pack(pady=(10, 4))
         lbl = tk.Label(caja, text=valor, bg=COLORES["tarjeta"], fg=COLORES["texto"],
-                       font=FUENTES["valor_grande"])
+                        font=FUENTES["valor_grande"])
         lbl.pack()
         return lbl
 
@@ -99,9 +99,9 @@ class PanelFlujo(tk.Frame):
     def actualizar_deposito(self, ocupacion):
         """
         Refresca la card de ocupacion del deposito y la pinta segun el nivel:
-          verde   < 70%   (holgado)
-          naranja 70-90%  (cargado)
-          rojo    > 90%   (desbordado -> dispara Alternativa A)
+        verde   < 70%   (holgado)
+        naranja 70-90%  (cargado)
+        rojo    > 90%   (desbordado -> dispara Alternativa A)
         """
         if ocupacion < 0.70:
             color = COLORES["reciclaje"]   # verde
@@ -112,6 +112,6 @@ class PanelFlujo(tk.Frame):
 
         # Repintar todos los elementos de la card
         for w in (self.card_dep, self.lbl_dep_icono, self.lbl_dep_titulo,
-                  self.lbl_dep_valor):
+                    self.lbl_dep_valor):
             w.config(bg=color)
         self.lbl_dep_valor.config(text=f"{ocupacion:.0%}")

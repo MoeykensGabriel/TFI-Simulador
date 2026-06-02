@@ -96,8 +96,8 @@ class PanelParametros(tk.Frame):
         self.semanas   = campo_parametro(parent, "Semanas de simulacion", range(4, 13), 4)
 
         # --- Boton iniciar ---
-        btn = tk.Button(
-            parent, text="  Iniciar Simulacion", bg=COLORES["boton"],
+        self.btn_simular = btn = tk.Button(
+            parent, text="Iniciar Simulacion", bg=COLORES["boton"],
             fg="white", font=FUENTES["boton"], relief="flat", cursor="hand2",
             pady=8, command=self._iniciar,
         )
@@ -124,4 +124,7 @@ class PanelParametros(tk.Frame):
 
     def _iniciar(self):
         if self.al_iniciar:
-            self.al_iniciar(self.obtener_valores())
+            if self.al_iniciar(self.obtener_valores()):
+                self.btn_simular.config(text="Detener Simulacion")
+            else:
+                self.btn_simular.config(text="Iniciar Simulacion")

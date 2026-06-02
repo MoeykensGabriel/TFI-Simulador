@@ -25,6 +25,7 @@ from src.simulacion.alternativas import evaluar_alternativas
 class VentanaPrincipal:
     def __init__(self, root: tk.Tk):
         self.root = root
+        self.simulando = False
         self._configurar_ventana()
         self._header()
         self._cuerpo()
@@ -85,14 +86,21 @@ class VentanaPrincipal:
         semana, refresca la pantalla, y agenda la siguiente con 3
         segundos de pausa para que se vea el avance en tiempo real.
         """
+        if(self.simulando):
+            self.simulando = False
+            self.total_semanas = self.semana_actual 
+            return False
         p = Parametros.desde_gui(valores)
         self.modelo = ModeloSimulacion(p)
         self.total_semanas = p.semanas_simulacion
         self.semana_actual = 1
         self.simulando = True
         self._puntos = 0
+        self.panel_result.esconder_boton_recomendaciones()  # por si se corrio antes
+        self.panel_flujo.actualizar_deposito(0)
         self._animar_puntos()      # arranca la animacion de puntos
         self._procesar_semana()
+        return True
 
     def _animar_puntos(self):
         """Hace parpadear los puntos del aviso (. .. ...) mientras simula."""
@@ -150,6 +158,26 @@ class VentanaPrincipal:
         # Agendar la proxima semana: esperar 3s y recien ahi avanzar
         def siguiente():
             self.semana_actual += 1
+            # Si era la ultima semana, terminar
+            if self.semana_actual >= self.total_semanas:
+                self.simulando = False
+                # Correr la teoria de colas (M/M/c) y refrescar espera + ocupacion
+                self.modelo.calcular_colas()
+                self.panel_result.actualizar(
+                    total=r.total_procesados,
+                    espera_min=round(r.wq_min),
+                    rentabilidad=r.ganancia_neta,
+                    promedio_lote=r.promedio_por_lote,
+                )
+                self.panel_flujo.actualizar_deposito(r.ocupacion_deposito)
+                self.panel_flujo.actualizar_estado(
+                    f"Simulacion finalizada ({self.total_semanas} semanas)",
+                    color=COLORES["reciclaje"],
+                )
+                # Evaluar las 4 alternativas y habilitar el boton de recomendaciones
+                self.alternativas = evaluar_alternativas(r, self.modelo.p)
+                self.panel_result.mostrar_boton_recomendaciones()
+                return
             self._procesar_semana()
 
         self.root.after(self.PAUSA_SEMANA, siguiente)
