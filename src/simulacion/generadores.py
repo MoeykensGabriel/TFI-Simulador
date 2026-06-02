@@ -11,8 +11,8 @@
 #  NO usan SimPy ni dibujan nada: solo numeros.
 # ============================================================
 
-import random
 from dataclasses import dataclass
+from src.simulacion import random_propio as random
 from src.simulacion.parametros import Parametros
 
 

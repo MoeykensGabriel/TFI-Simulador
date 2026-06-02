@@ -12,7 +12,7 @@
 #  NO usa SimPy ni dibuja: solo devuelve numeros.
 # ============================================================
 
-import random
+from src.simulacion import random_propio as random
 from src.simulacion.parametros import Parametros
 from src.simulacion.generadores import Dispositivo
 

@@ -16,8 +16,8 @@
 #  NO dibuja nada: devuelve un diccionario de metricas.
 # ============================================================
 
-import random
 import simpy
+from src.simulacion import random_propio as random
 from src.simulacion.parametros import Parametros
 from src.simulacion.generadores import generar_lote, generar_cant_lotes
 
