@@ -43,6 +43,7 @@ class Parametros:
     tiempo_servicio_max: float = 3.0
     horas_dia: int = 8                # jornada: horas por dia
     dias_semana_laboral: int = 5      # jornada: dias por semana
+    capacidad_deposito: int = 10000   # capacidad del deposito (dispositivos)
 
     # --- Probabilidades de canal (acumuladas: 0.37 / 0.83 / 1.00) ---
     prop_venta: float = 0.37

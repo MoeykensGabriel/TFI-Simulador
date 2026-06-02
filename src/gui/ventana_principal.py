@@ -116,22 +116,26 @@ class VentanaPrincipal:
             desecho=r.a_desecho,
         )
 
-        # Refrescar metricas (la espera se calcula al final, con las colas)
+        # Refrescar metricas (la espera/ocupacion se calculan al final)
         self.panel_result.actualizar(
             total=r.total_procesados,
             espera_min=round(r.wq_min),
             rentabilidad=r.ganancia_neta,
+            promedio_lote=r.promedio_por_lote,
+            ocupacion=r.ocupacion_deposito,
         )
 
         # Si era la ultima semana, terminar
         if self.semana_actual >= self.total_semanas:
             self.simulando = False
-            # Correr la teoria de colas (M/M/c) y refrescar la espera real
+            # Correr la teoria de colas (M/M/c) y refrescar espera + ocupacion
             self.modelo.calcular_colas()
             self.panel_result.actualizar(
                 total=r.total_procesados,
                 espera_min=round(r.wq_min),
                 rentabilidad=r.ganancia_neta,
+                promedio_lote=r.promedio_por_lote,
+                ocupacion=r.ocupacion_deposito,
             )
             self.panel_flujo.actualizar_estado(
                 f"Simulacion finalizada ({self.total_semanas} semanas)",

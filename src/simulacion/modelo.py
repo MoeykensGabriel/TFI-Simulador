@@ -34,6 +34,7 @@ class ModeloSimulacion:
         """
         r = self.resultados
         semana = generar_semana(self.p)
+        r.total_lotes += len(semana)
         for lote in semana:
             for d in lote:
                 clasificar(d, self.p)
@@ -69,6 +70,7 @@ class ModeloSimulacion:
         r.lq = m["lq"]
         r.utilizacion = m["utilizacion"]
         r.max_cola = m["max_cola"]
+        r.ocupacion_deposito = m["ocupacion"]
         return r
 
     def correr(self) -> Resultados:

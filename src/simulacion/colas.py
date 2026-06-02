@@ -96,11 +96,15 @@ def simular_colas(p: Parametros) -> dict:
     env.run()   # corre hasta que no quedan eventos (todos atendidos)
 
     duracion = env.now
+    # Ocupacion del deposito: cola maxima observada sobre la capacidad.
+    # Puede superar el 100% (el deposito se desborda) -> dispara Alt. A.
+    ocupacion = m.max_cola / p.capacidad_deposito if p.capacidad_deposito else 0.0
     return {
         "wq": m.wq(),                                        # min en cola
         "lq": m.lq(duracion),                                # dispositivos
         "utilizacion": m.utilizacion(duracion, p.cantidad_operarios),
         "max_cola": m.max_cola,
+        "ocupacion": ocupacion,                              # 0 a 1+ (fraccion)
         "duracion": duracion,
         "atendidos": len(m.esperas),
     }

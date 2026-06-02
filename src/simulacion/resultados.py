@@ -17,6 +17,7 @@ class Resultados:
 
     # --- Conteos por canal ---
     total_procesados: int = 0
+    total_lotes: int = 0          # cantidad de lotes recibidos en el periodo
     a_venta: int = 0
     a_reciclaje: int = 0
     a_desecho: int = 0
@@ -33,6 +34,7 @@ class Resultados:
     lq: float = 0.0               # largo medio de la cola (dispositivos)
     utilizacion: float = 0.0      # utilizacion de operarios (0 a 1)
     max_cola: int = 0             # cola maxima observada
+    ocupacion_deposito: float = 0.0  # fraccion ocupada del deposito (0 a 1+)
 
     # --- Series para graficos ---
     serie_arribos: list = field(default_factory=list)
@@ -44,6 +46,13 @@ class Resultados:
     def ganancia_neta(self) -> float:
         """GTN = ingresos (reventa + materiales) - costo operativo."""
         return self.ganancia_reventa + self.ganancia_materiales - self.costo_operativo
+
+    @property
+    def promedio_por_lote(self) -> float:
+        """Dispositivos promedio por lote recibido."""
+        if self.total_lotes == 0:
+            return 0.0
+        return self.total_procesados / self.total_lotes
 
     def espera_promedio(self) -> float:
         if not self.tiempos_espera:
