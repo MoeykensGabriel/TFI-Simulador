@@ -17,6 +17,7 @@ from src.simulacion.parametros import Parametros
 from src.simulacion.resultados import Resultados
 from src.simulacion.generadores import generar_semana
 from src.simulacion.clasificador import clasificar
+from src.simulacion.calculadora import valor_reventa, valor_materiales, costo_operarios
 
 
 class ModeloSimulacion:
@@ -36,12 +37,23 @@ class ModeloSimulacion:
             for d in lote:
                 clasificar(d, self.p)
                 r.total_procesados += 1
+
                 if d.canal == "reventa":
                     r.a_venta += 1
+                    r.ganancia_reventa += valor_reventa(d, self.p)
                 elif d.canal == "reciclaje":
                     r.a_reciclaje += 1
-                else:
+                    r.ganancia_materiales += valor_materiales(d, self.p)
+                else:  # desecho
                     r.a_desecho += 1
+                    if d.mal_clasificado:
+                        # era reventa: se perdio el valor que habria tenido
+                        r.mal_clasificados += 1
+                        r.perdida_clasificacion += valor_reventa(d, self.p)
+
+        # El costo operativo es fijo del periodo (no por semana):
+        # se recalcula con el total de operarios cada vez.
+        r.costo_operativo = costo_operarios(self.p)
         return r
 
     def correr(self) -> Resultados:

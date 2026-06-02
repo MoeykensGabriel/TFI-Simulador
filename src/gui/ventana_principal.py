@@ -116,11 +116,11 @@ class VentanaPrincipal:
             desecho=r.a_desecho,
         )
 
-        # Refrescar metricas (rentabilidad y espera quedan en 0 por ahora)
+        # Refrescar metricas (espera queda en 0 hasta implementar colas)
         self.panel_result.actualizar(
             total=r.total_procesados,
             espera_min=0,
-            rentabilidad=0,
+            rentabilidad=r.ganancia_neta,
         )
 
         # Si era la ultima semana, terminar
