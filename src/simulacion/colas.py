@@ -43,7 +43,6 @@ class MetricasColas:
             return 0.0
         return min(self.tiempo_ocupado / (duracion * c), 1.0)
 
-
 def _atender(env, mesa, p, llegada, m: MetricasColas):
     """Proceso de UN dispositivo: pide operario, espera, es atendido."""
     # Registrar el largo de cola al llegar
@@ -56,7 +55,7 @@ def _atender(env, mesa, p, llegada, m: MetricasColas):
         yield env.timeout(dur)           # DELAY (RELEASE al salir del with)
 
 
-def _generar_llegadas(env, mesa, p, m: MetricasColas):
+def _generar_llegadas(env, mesa, p, m: MetricasColas, duracion_semanas, lotes_semanas):
     """
     Genera los lotes a lo largo del periodo. Cada lote llega en un
     instante y vuelca todos sus dispositivos a la cola de la mesa.
@@ -65,25 +64,29 @@ def _generar_llegadas(env, mesa, p, m: MetricasColas):
     total_min = p.minutos_periodo()
 
     # Armar la lista de lotes (todas las semanas) con su hora de arribo
-    arribos = []
-    for semana in range(p.semanas_simulacion):
+    horas_arribos = []
+    lotes_horas = []
+    for semana in range(duracion_semanas):
         base = semana * p.dias_semana_laboral * p.horas_dia * 60
         ancho = p.dias_semana_laboral * p.horas_dia * 60
-        for _ in range(generar_cant_lotes(p)):
+        for lote in lotes_semanas[semana]:
             hora = base + random.uniform(0, ancho)
-            arribos.append(hora)
-    arribos.sort()
+            horas_arribos.append(hora)
+            lotes_horas.append((hora, lotes_semanas[semana][lotes_semanas[semana].index(lote)]))
+    horas_arribos.sort()
+    lotes_horas.sort(key=lambda x: x[0])
 
     # Disparar cada lote en su instante
     t_anterior = 0.0
-    for hora in arribos:
+    for hora in horas_arribos:
         yield env.timeout(max(hora - t_anterior, 0))
         t_anterior = hora
-        for d in generar_lote(p):
+        lote = lotes_horas[horas_arribos.index(hora)][1]
+        for _ in lote:
             env.process(_atender(env, mesa, p, env.now, m))
 
 
-def simular_colas(p: Parametros) -> dict:
+def simular_colas(p: Parametros, duracion_semanas, lotes_semanas) -> dict:
     """
     Corre la simulacion M/M/c de la mesa de clasificacion y
     devuelve las metricas de teoria de colas.
@@ -92,7 +95,7 @@ def simular_colas(p: Parametros) -> dict:
     mesa = simpy.Resource(env, capacity=p.cantidad_operarios)
     m = MetricasColas()
 
-    env.process(_generar_llegadas(env, mesa, p, m))
+    env.process(_generar_llegadas(env, mesa, p, m, duracion_semanas, lotes_semanas))
     env.run()   # corre hasta que no quedan eventos (todos atendidos)
 
     duracion = env.now

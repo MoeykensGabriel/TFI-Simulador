@@ -38,10 +38,10 @@ def generar_dispositivo(p: Parametros) -> Dispositivo:
     # 1) Tipo de dispositivo
     if random.random() <= p.prop_celular:
         tipo = "celular"
-        peso = p.cel_peso_base + p.cel_peso_rango * random.random()
+        peso = p.cel_peso_base + (p.cel_peso_rango * random.random())
     else:
         tipo = "tablet"
-        peso = p.tab_peso_base + p.tab_peso_rango * random.random()
+        peso = p.tab_peso_base + (p.tab_peso_rango * random.random())
 
     # 2) Es moderno?
     moderno = random.random() <= p.prop_moderno
@@ -57,7 +57,7 @@ def generar_peso_lote(p: Parametros) -> float:
 
 def generar_cant_lotes(p: Parametros) -> int:
     """Cantidad de lotes de la semana, entero entre lotes_min y lotes_max."""
-    return random.randint(int(p.lotes_semanales_A), int(p.lotes_semanales_B))
+    return int(p.lotes_semanales_A + (p.lotes_semanales_B * random.random()) )
 
 
 def generar_lote(p: Parametros) -> list:
@@ -69,11 +69,11 @@ def generar_lote(p: Parametros) -> list:
     Devuelve la lista de Dispositivos que componen el lote.
     """
     peso_objetivo = generar_peso_lote(p)   # PL
-    peso_acumulado = 0.0                    # SP
+    peso_acumulado = 0.0                   # SP
     dispositivos = []
 
     while peso_acumulado <= peso_objetivo:
-        d = generar_dispositivo(p)
+        d = generar_dispositivo(p)# Solo para debug
         dispositivos.append(d)
         peso_acumulado += d.peso            # SP = SP + PD
 

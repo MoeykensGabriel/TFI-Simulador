@@ -34,6 +34,7 @@ class ModeloSimulacion:
         """
         r = self.resultados
         semana = generar_lote_semana(self.p)
+        r.lotes_semana = semana
         r.total_lotes += len(semana)
         for lote in semana:
             for d in lote:
@@ -41,7 +42,6 @@ class ModeloSimulacion:
                 r.total_procesados += 1
                 if d.moderno:
                     r.modernos += 1
-
                 if d.canal == "reventa":
                     r.a_venta += 1
                     r.ganancia_reventa += valor_reventa(d, self.p)
@@ -60,14 +60,14 @@ class ModeloSimulacion:
         r.costo_operativo = costo_operarios(self.p)
         return r
 
-    def calcular_colas(self) -> Resultados:
+    def calcular_colas(self, duracion_semanas, lotes_semanas) -> Resultados:
         """
         Corre la simulacion de colas M/M/c de la mesa de clasificacion
         y guarda las metricas (Wq, Lq, utilizacion) en los resultados.
         Se llama una vez, al terminar el conteo de todas las semanas.
         """
         r = self.resultados
-        m = simular_colas(self.p)
+        m = simular_colas(self.p, duracion_semanas, lotes_semanas)
         r.wq_min = m["wq"]
         r.lq = m["lq"]
         r.utilizacion = m["utilizacion"]

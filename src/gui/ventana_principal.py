@@ -93,6 +93,7 @@ class VentanaPrincipal:
         p = Parametros.desde_gui(valores)
         self.modelo = ModeloSimulacion(p)
         self.total_semanas = p.semanas_simulacion
+        self.lotes_semanas = []
         self.semana_actual = 1
         self.simulando = True
         self._puntos = 0
@@ -116,6 +117,8 @@ class VentanaPrincipal:
     def _procesar_semana(self):
         """Procesa una semana, actualiza los paneles y agenda la siguiente."""
         r = self.modelo.correr_semana()   # acumula una semana mas
+        self.lotes_semanas.append(r.lotes_semana)  # para la simulacion de colas al final
+        print(len(self.lotes_semanas)) # Solo para debug
 
         # Refrescar el panel central con los acumulados hasta ahora
         self.panel_flujo.actualizar(
@@ -138,7 +141,7 @@ class VentanaPrincipal:
         if self.semana_actual >= self.total_semanas:
             self.simulando = False
             # Correr la teoria de colas (M/M/c) y refrescar espera + ocupacion
-            self.modelo.calcular_colas()
+            self.modelo.calcular_colas(self.total_semanas, self.lotes_semanas)
             self.panel_result.actualizar(
                 total=r.total_procesados,
                 espera_min=round(r.wq_min),
@@ -159,10 +162,10 @@ class VentanaPrincipal:
         def siguiente():
             self.semana_actual += 1
             # Si era la ultima semana, terminar
-            if self.semana_actual >= self.total_semanas:
+            if self.semana_actual > self.total_semanas:
                 self.simulando = False
                 # Correr la teoria de colas (M/M/c) y refrescar espera + ocupacion
-                self.modelo.calcular_colas()
+                self.modelo.calcular_colas(self.total_semanas, self.lotes_semanas)
                 self.panel_result.actualizar(
                     total=r.total_procesados,
                     espera_min=round(r.wq_min),
