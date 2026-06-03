@@ -44,7 +44,7 @@ class VentanaPrincipal:
         barra = tk.Frame(self.root, bg=COLORES["header"], height=60)
         barra.pack(fill="x")
         barra.pack_propagate(False)
-        tk.Label(barra, text="SIMULADOR DE CLASIFICACION DE RAEE",
+        tk.Label(barra, text="SIMULADOR DE CLASIFICACION DE RAEE V1.0",
         bg=COLORES["header"], fg=COLORES["texto_claro"],
         font=FUENTES["titulo_app"]).pack(side="left", padx=20, pady=8)
         tk.Label(barra, text="Scrap & Rezagos S.R.L.",
