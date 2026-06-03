@@ -57,12 +57,12 @@ class PanelFlujo(tk.Frame):
         self.card_dep.pack_propagate(False)
 
         # Icono + titulo en un renglon
-        cabecera = tk.Frame(self.card_dep, bg=COLORES["reciclaje"])
-        cabecera.pack(pady=(10, 0))
-        self.lbl_dep_icono = tk.Label(cabecera, text="\U0001F4E6", bg=COLORES["reciclaje"],
+        self.cabecera_dep = tk.Frame(self.card_dep, bg=COLORES["reciclaje"])
+        self.cabecera_dep.pack(pady=(10, 0))
+        self.lbl_dep_icono = tk.Label(self.cabecera_dep, text="\U0001F4E6", bg=COLORES["reciclaje"],
                                         fg="white", font=("Segoe UI Emoji", 16))
         self.lbl_dep_icono.pack(side="left", padx=(0, 6))
-        self.lbl_dep_titulo = tk.Label(cabecera, text="OCUPACION DEPOSITO",
+        self.lbl_dep_titulo = tk.Label(self.cabecera_dep, text="OCUPACION DEPOSITO",
                                         bg=COLORES["reciclaje"], fg="white",
                                         font=FUENTES["texto_normal"])
         self.lbl_dep_titulo.pack(side="left")
@@ -110,8 +110,8 @@ class PanelFlujo(tk.Frame):
         else:
             color = COLORES["venta"]       # rojo
 
-        # Repintar todos los elementos de la card
-        for w in (self.card_dep, self.lbl_dep_icono, self.lbl_dep_titulo,
-                    self.lbl_dep_valor):
+        # Repintar todos los elementos de la card (incluida la cabecera)
+        for w in (self.card_dep, self.cabecera_dep, self.lbl_dep_icono,
+                    self.lbl_dep_titulo, self.lbl_dep_valor):
             w.config(bg=color)
         self.lbl_dep_valor.config(text=f"{ocupacion:.0%}")
