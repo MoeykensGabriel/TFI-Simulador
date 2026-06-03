@@ -118,7 +118,6 @@ class VentanaPrincipal:
         """Procesa una semana, actualiza los paneles y agenda la siguiente."""
         r = self.modelo.correr_semana()   # acumula una semana mas
         self.lotes_semanas.append(r.lotes_semana)  # para la simulacion de colas al final
-        print(len(self.lotes_semanas)) # Solo para debug
 
         # Refrescar el panel central con los acumulados hasta ahora
         self.panel_flujo.actualizar(
@@ -137,53 +136,40 @@ class VentanaPrincipal:
             promedio_lote=r.promedio_por_lote,
         )
 
-        # Si era la ultima semana, terminar
-        if self.semana_actual >= self.total_semanas:
-            self.simulando = False
-            # Correr la teoria de colas (M/M/c) y refrescar espera + ocupacion
-            self.modelo.calcular_colas(self.total_semanas, self.lotes_semanas)
-            self.panel_result.actualizar(
-                total=r.total_procesados,
-                espera_min=round(r.wq_min),
-                rentabilidad=r.ganancia_neta,
-                promedio_lote=r.promedio_por_lote,
-            )
-            self.panel_flujo.actualizar_deposito(r.ocupacion_deposito)
-            self.panel_flujo.actualizar_estado(
-                f"Simulacion finalizada ({self.total_semanas} semanas)",
-                color=COLORES["reciclaje"],
-            )
-            # Evaluar las 4 alternativas y habilitar el boton de recomendaciones
-            self.alternativas = evaluar_alternativas(r, self.modelo.p)
-            self.panel_result.mostrar_boton_recomendaciones()
+        # Si era la ultima semana o el usuario freno, finalizar
+        if not self.simulando or self.semana_actual >= self.total_semanas:
+            self._finalizar(r)
             return
 
         # Agendar la proxima semana: esperar 3s y recien ahi avanzar
         def siguiente():
-            self.semana_actual += 1
-            # Si era la ultima semana, terminar
-            if self.semana_actual > self.total_semanas:
-                self.simulando = False
-                # Correr la teoria de colas (M/M/c) y refrescar espera + ocupacion
-                self.modelo.calcular_colas(self.total_semanas, self.lotes_semanas)
-                self.panel_result.actualizar(
-                    total=r.total_procesados,
-                    espera_min=round(r.wq_min),
-                    rentabilidad=r.ganancia_neta,
-                    promedio_lote=r.promedio_por_lote,
-                )
-                self.panel_flujo.actualizar_deposito(r.ocupacion_deposito)
-                self.panel_flujo.actualizar_estado(
-                    f"Simulacion finalizada ({self.total_semanas} semanas)",
-                    color=COLORES["reciclaje"],
-                )
-                # Evaluar las 4 alternativas y habilitar el boton de recomendaciones
-                self.alternativas = evaluar_alternativas(r, self.modelo.p)
-                self.panel_result.mostrar_boton_recomendaciones()
+            if not self.simulando:        # el usuario freno durante la pausa
+                self._finalizar(r)
                 return
+            self.semana_actual += 1
             self._procesar_semana()
 
         self.root.after(self.PAUSA_SEMANA, siguiente)
+
+    def _finalizar(self, r):
+        """Cierra la simulacion: corre las colas, muestra metricas y el boton."""
+        self.simulando = False
+        # Teoria de colas (M/M/c) con los lotes realmente generados
+        self.modelo.calcular_colas(self.total_semanas, self.lotes_semanas)
+        self.panel_result.actualizar(
+            total=r.total_procesados,
+            espera_min=round(r.wq_min),
+            rentabilidad=r.ganancia_neta,
+            promedio_lote=r.promedio_por_lote,
+        )
+        self.panel_flujo.actualizar_deposito(r.ocupacion_deposito)
+        self.panel_flujo.actualizar_estado(
+            f"Simulacion finalizada ({self.semana_actual} semanas)",
+            color=COLORES["reciclaje"],
+        )
+        # Evaluar las 4 alternativas y habilitar el boton de recomendaciones
+        self.alternativas = evaluar_alternativas(r, self.modelo.p)
+        self.panel_result.mostrar_boton_recomendaciones()
 
     def _abrir_recomendaciones(self):
         """Abre la ventana con el diagnostico de las 4 alternativas."""
