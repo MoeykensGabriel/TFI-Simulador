@@ -1,21 +1,3 @@
-# ============================================================
-#  colas.py  -  Teoria de Colas (SimPy, M/M/c)
-# ------------------------------------------------------------
-#  AQUI VA: la simulacion de eventos discretos de la Mesa de
-#  Clasificacion como un sistema de colas M/M/c:
-#    - c servidores en paralelo  = cantidad_operarios
-#    - servicio por dispositivo  = UNIF(1, 3) minutos
-#    - disciplina FIFO
-#
-#  Reproduce la logica Seize -> Delay -> Release del DFD/Arena.
-#  Mide los indicadores de Teoria de Colas:
-#    Wq = tiempo medio de espera en cola
-#    Lq = largo medio de la cola (via Little: Lq = Wq * lambda)
-#    rho = utilizacion de los operarios
-#
-#  NO dibuja nada: devuelve un diccionario de metricas.
-# ============================================================
-
 import simpy
 from src.simulacion import random_propio as random
 from src.simulacion.parametros import Parametros
@@ -23,47 +5,39 @@ from src.simulacion.generadores import generar_lote, generar_cant_lotes
 
 
 class MetricasColas:
-    """Acumula las mediciones de la simulacion de colas."""
     def __init__(self):
-        self.esperas = []          # tiempo en cola de cada dispositivo
-        self.tiempo_ocupado = 0.0  # suma de tiempos de servicio (server-min)
-        self.max_cola = 0          # largo maximo observado de la cola
+        self.esperas = []
+        self.tiempo_ocupado = 0.0
+        self.max_cola = 0
 
     def wq(self) -> float:
-        """Tiempo medio de espera en cola (minutos)."""
+        # tiempo medio de espera en cola
         return sum(self.esperas) / len(self.esperas) if self.esperas else 0.0
 
     def lq(self, duracion: float) -> float:
-        """Largo medio de cola por Little: Lq = (suma de esperas) / tiempo total."""
+        # largo medio de cola por ley de little
         return sum(self.esperas) / duracion if duracion > 0 else 0.0
 
     def utilizacion(self, duracion: float, c: int) -> float:
-        """Fraccion del tiempo que los operarios estuvieron ocupados (0 a 1)."""
+        # rho = tiempo ocupado / (duracion * c operarios)
         if duracion <= 0 or c <= 0:
             return 0.0
         return min(self.tiempo_ocupado / (duracion * c), 1.0)
 
 def _atender(env, mesa, p, llegada, m: MetricasColas):
-    """Proceso de UN dispositivo: pide operario, espera, es atendido."""
-    # Registrar el largo de cola al llegar
+    # seize, delay, release con uniforme para servicio
     m.max_cola = max(m.max_cola, len(mesa.queue))
-    with mesa.request() as turno:        # SEIZE
+    with mesa.request() as turno:
         yield turno
         m.esperas.append(env.now - llegada)
         dur = random.uniform(p.tiempo_servicio_min, p.tiempo_servicio_max)
         m.tiempo_ocupado += dur
-        yield env.timeout(dur)           # DELAY (RELEASE al salir del with)
+        yield env.timeout(dur)
 
 
 def _generar_llegadas(env, mesa, p, m: MetricasColas, duracion_semanas, lotes_semanas):
-    """
-    Genera los lotes a lo largo del periodo. Cada lote llega en un
-    instante y vuelca todos sus dispositivos a la cola de la mesa.
-    Los lotes se reparten uniformemente en el tiempo laborable.
-    """
+    # distribucion uniforme para llegadas
     total_min = p.minutos_periodo()
-
-    # Armar la lista de lotes (todas las semanas) con su hora de arribo
     horas_arribos = []
     lotes_horas = []
     for semana in range(duracion_semanas):
@@ -76,7 +50,6 @@ def _generar_llegadas(env, mesa, p, m: MetricasColas, duracion_semanas, lotes_se
     horas_arribos.sort()
     lotes_horas.sort(key=lambda x: x[0])
 
-    # Disparar cada lote en su instante
     t_anterior = 0.0
     for hora in horas_arribos:
         yield env.timeout(max(hora - t_anterior, 0))
@@ -87,27 +60,22 @@ def _generar_llegadas(env, mesa, p, m: MetricasColas, duracion_semanas, lotes_se
 
 
 def simular_colas(p: Parametros, duracion_semanas, lotes_semanas) -> dict:
-    """
-    Corre la simulacion M/M/c de la mesa de clasificacion y
-    devuelve las metricas de teoria de colas.
-    """
+    # simulacion de eventos discretos M/M/c
     env = simpy.Environment()
     mesa = simpy.Resource(env, capacity=p.cantidad_operarios)
     m = MetricasColas()
 
     env.process(_generar_llegadas(env, mesa, p, m, duracion_semanas, lotes_semanas))
-    env.run()   # corre hasta que no quedan eventos (todos atendidos)
+    env.run()
 
     duracion = env.now
-    # Ocupacion del deposito: cola maxima observada sobre la capacidad.
-    # Puede superar el 100% (el deposito se desborda) -> dispara Alt. A.
     ocupacion = m.max_cola / p.capacidad_deposito if p.capacidad_deposito else 0.0
     return {
-        "wq": m.wq(),                                        # min en cola
-        "lq": m.lq(duracion),                                # dispositivos
+        "wq": m.wq(),
+        "lq": m.lq(duracion),
         "utilizacion": m.utilizacion(duracion, p.cantidad_operarios),
         "max_cola": m.max_cola,
-        "ocupacion": ocupacion,                              # 0 a 1+ (fraccion)
+        "ocupacion": ocupacion,
         "duracion": duracion,
         "atendidos": len(m.esperas),
     }

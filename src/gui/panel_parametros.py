@@ -87,7 +87,7 @@ class PanelParametros(tk.Frame):
         self.margen    = campo_parametro(parent, "Margen de rentabilidad (%)", MARGENES, 15)
 
         # --- Cantidad de operarios ---
-        self.operarios = campo_parametro(parent, "Cantidad de operarios", [3, 4], 3)
+        self.operarios = campo_parametro(parent, "Cantidad de operarios", range(3,10), 3)
 
         # --- Salario tecnico ---
         self.salario   = campo_parametro(parent, "Salario tecnico (miles $)", SALARIOS, 1100)
