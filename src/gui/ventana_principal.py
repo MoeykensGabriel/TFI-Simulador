@@ -112,6 +112,7 @@ class VentanaPrincipal:
         self.panel_result.esconder_boton_recomendaciones()  # por si se corrio antes
         self.panel_flujo.actualizar_deposito(0)
         self.panel_flujo.actualizar_progreso(0, self.total_semanas)
+        self.panel_flujo.limpiar_animacion()
         self._animar_puntos()      # arranca la animacion de puntos
         self._procesar_semana()
         return True
@@ -141,6 +142,9 @@ class VentanaPrincipal:
             reciclaje=r.a_reciclaje,
             desecho=r.a_desecho,
         )
+
+        # Animar dispositivos viajando por el flujo durante esta semana
+        self.panel_flujo.animar_semana((r.a_venta, r.a_reciclaje, r.a_desecho))
 
         # Refrescar metricas (la espera/ocupacion se calculan al final)
         self.panel_result.actualizar(
