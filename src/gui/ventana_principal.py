@@ -12,7 +12,7 @@
 # ============================================================
 
 import tkinter as tk
-from src.gui.tema import COLORES, FUENTES, MEDIDAS
+from src.gui.tema import COLORES, FUENTES, MEDIDAS, aplicar_estilo_ttk
 from src.gui.panel_parametros import PanelParametros
 from src.gui.panel_flujo import PanelFlujo
 from src.gui.panel_resultados import PanelResultados
@@ -34,22 +34,34 @@ class VentanaPrincipal:
         self.root.title("Simulador de Clasificacion de RAEE | Scrap y Rezagos S.R.L.")
         ancho, alto = MEDIDAS["ancho_ventana"], MEDIDAS["alto_ventana"]
         self.root.configure(bg=COLORES["fondo"])
+        aplicar_estilo_ttk(self.root)
         self.root.update_idletasks()
         x = (self.root.winfo_screenwidth()  - ancho) // 2
         y = (self.root.winfo_screenheight() - alto)  // 2
         self.root.geometry(f"{ancho}x{alto}+{x}+{y}")
-        self.root.minsize(1100, 620)
+        self.root.minsize(1100, 640)
 
     def _header(self):
-        barra = tk.Frame(self.root, bg=COLORES["header"], height=60)
+        barra = tk.Frame(self.root, bg=COLORES["header"], height=64)
         barra.pack(fill="x")
         barra.pack_propagate(False)
-        tk.Label(barra, text="SIMULADOR DE CLASIFICACION DE RAEE V1.0",
+
+        # bloque de titulo + subtitulo a la izquierda
+        izq = tk.Frame(barra, bg=COLORES["header"])
+        izq.pack(side="left", padx=22, pady=10)
+        tk.Label(izq, text="Simulador de Clasificacion de RAEE",
         bg=COLORES["header"], fg=COLORES["texto_claro"],
-        font=FUENTES["titulo_app"]).pack(side="left", padx=20, pady=8)
+        font=FUENTES["titulo_app"], anchor="w").pack(anchor="w")
+        tk.Label(izq, text="Optimizacion del proceso de clasificacion  -  v1.0",
+        bg=COLORES["header"], fg="#94A3B8",
+        font=FUENTES["subtitulo_app"], anchor="w").pack(anchor="w")
+
         tk.Label(barra, text="Scrap & Rezagos S.R.L.",
-        bg=COLORES["header"], fg=COLORES["texto_claro"],
-        font=FUENTES["valor_medio"]).pack(side="right", padx=20)
+        bg=COLORES["header"], fg=COLORES["header_acento"],
+        font=FUENTES["valor_medio"]).pack(side="right", padx=22)
+
+        # linea de acento bajo el header
+        tk.Frame(self.root, bg=COLORES["header_acento"], height=3).pack(fill="x")
 
     def _cuerpo(self):
         cuerpo = tk.Frame(self.root, bg=COLORES["fondo"])
@@ -99,6 +111,7 @@ class VentanaPrincipal:
         self._puntos = 0
         self.panel_result.esconder_boton_recomendaciones()  # por si se corrio antes
         self.panel_flujo.actualizar_deposito(0)
+        self.panel_flujo.actualizar_progreso(0, self.total_semanas)
         self._animar_puntos()      # arranca la animacion de puntos
         self._procesar_semana()
         return True
@@ -118,6 +131,7 @@ class VentanaPrincipal:
         """Procesa una semana, actualiza los paneles y agenda la siguiente."""
         r = self.modelo.correr_semana()   # acumula una semana mas
         self.lotes_semanas.append(r.lotes_semana)  # para la simulacion de colas al final
+        self.panel_flujo.actualizar_progreso(self.semana_actual, self.total_semanas)
 
         # Refrescar el panel central con los acumulados hasta ahora
         self.panel_flujo.actualizar(
@@ -170,6 +184,7 @@ class VentanaPrincipal:
         # Evaluar las 4 alternativas y habilitar el boton de recomendaciones
         self.alternativas = evaluar_alternativas(r, self.modelo.p)
         self.panel_result.mostrar_boton_recomendaciones()
+        self.panel_param.resetear_boton()
 
     def _abrir_recomendaciones(self):
         """Abre la ventana con el diagnostico de las 4 alternativas."""

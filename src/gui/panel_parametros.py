@@ -97,13 +97,23 @@ class PanelParametros(tk.Frame):
 
         # --- Boton iniciar ---
         self.btn_simular = btn = tk.Button(
-            parent, text="Iniciar Simulacion", bg=COLORES["boton"],
+            parent, text="▶  Iniciar Simulacion", bg=COLORES["boton"],
             fg="white", font=FUENTES["boton"], relief="flat", cursor="hand2",
-            pady=8, command=self._iniciar,
+            activebackground=COLORES["boton_hover"], activeforeground="white",
+            bd=0, pady=11, command=self._iniciar,
         )
-        btn.pack(fill="x", pady=(14, 0))
-        btn.bind("<Enter>", lambda e: btn.config(bg=COLORES["boton_hover"]))
-        btn.bind("<Leave>", lambda e: btn.config(bg=COLORES["boton"]))
+        btn.pack(fill="x", pady=(18, 6))
+        btn.bind("<Enter>", lambda e: btn.config(bg=self._color_hover()))
+        btn.bind("<Leave>", lambda e: btn.config(bg=self._color_base()))
+
+    def _corriendo(self):
+        return "Detener" in self.btn_simular["text"]
+
+    def _color_base(self):
+        return COLORES["boton_stop"] if self._corriendo() else COLORES["boton"]
+
+    def _color_hover(self):
+        return COLORES["boton_stop_hover"] if self._corriendo() else COLORES["boton_hover"]
 
     def obtener_valores(self):
         """Devuelve un diccionario con todos los valores elegidos por el usuario."""
@@ -122,9 +132,13 @@ class PanelParametros(tk.Frame):
             "semanas":        int(self.semanas.get()),
         }
 
+    def resetear_boton(self):
+        """Vuelve el boton a 'Iniciar' cuando la simulacion termina sola."""
+        self.btn_simular.config(text="▶  Iniciar Simulacion", bg=COLORES["boton"])
+
     def _iniciar(self):
         if self.al_iniciar:
             if self.al_iniciar(self.obtener_valores()):
-                self.btn_simular.config(text="Detener Simulacion")
+                self.btn_simular.config(text="■  Detener Simulacion", bg=COLORES["boton_stop"])
             else:
-                self.btn_simular.config(text="Iniciar Simulacion")
+                self.btn_simular.config(text="▶  Iniciar Simulacion", bg=COLORES["boton"])

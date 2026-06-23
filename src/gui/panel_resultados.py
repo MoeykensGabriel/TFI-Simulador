@@ -30,24 +30,24 @@ class PanelResultados(tk.Frame):
 
         # --- Boton de recomendaciones (oculto hasta terminar la simulacion) ---
         self.btn_recom = tk.Button(
-            self, text="Ver Recomendaciones", bg=COLORES["boton"],
+            self, text="📋  Ver Recomendaciones", bg=COLORES["boton"],
             fg="white", font=FUENTES["boton"], relief="flat", cursor="hand2",
-            pady=8, command=self._click_recomendaciones,
+            activebackground=COLORES["boton_hover"], activeforeground="white",
+            bd=0, pady=11, command=self._click_recomendaciones,
         )
         self.btn_recom.bind("<Enter>", lambda e: self.btn_recom.config(bg=COLORES["boton_hover"]))
         self.btn_recom.bind("<Leave>", lambda e: self.btn_recom.config(bg=COLORES["boton"]))
         # No se hace pack() todavia: aparece solo al finalizar
 
         # --- Espacio reservado para los graficos ---
-        # Aqui en el proximo avance se incrustan los canvas de Matplotlib
-        # (tasa de arribos y ocupacion del deposito), generados desde
-        # src/graficos/.
-        self.contenedor_graficos = tk.Frame(self, bg=COLORES["panel_result"])
-        self.contenedor_graficos.pack(fill="both", expand=True, pady=(14, 0))
+        self.contenedor_graficos = tk.Frame(
+            self, bg=COLORES["superficie_alt"],
+            highlightbackground=COLORES["borde"], highlightthickness=1)
+        self.contenedor_graficos.pack(fill="both", expand=True, pady=(16, 0))
         tk.Label(self.contenedor_graficos,
-                    text="[ graficos: tasa de arribos\n y ocupacion deposito ]",
-                    bg=COLORES["panel_result"], fg=COLORES["subtexto"],
-                    font=FUENTES["texto_normal"]).pack(expand=True)
+                    text="📊\n\ngraficos de arribos\ny ocupacion del deposito",
+                    bg=COLORES["superficie_alt"], fg=COLORES["subtexto"],
+                    font=FUENTES["texto_normal"], justify="center").pack(expand=True)
 
     def actualizar(self, total, espera_min, rentabilidad, promedio_lote=0):
         """La simulacion llama a esto al terminar para mostrar los resultados."""

@@ -10,13 +10,14 @@
 # ============================================================
 
 import tkinter as tk
+from tkinter import ttk
 from src.gui.tema import COLORES, FUENTES
 from src.gui.componentes import titulo_panel, tarjeta_canal
 
 
 class PanelFlujo(tk.Frame):
     def __init__(self, parent):
-        super().__init__(parent, bg=COLORES["panel_centro"], padx=14, pady=14)
+        super().__init__(parent, bg=COLORES["panel_centro"], padx=18, pady=16)
         self._construir()
 
     def _construir(self):
@@ -28,7 +29,14 @@ class PanelFlujo(tk.Frame):
             bg=COLORES["panel_centro"], fg=COLORES["texto"],
             font=FUENTES["valor_medio"],
         )
-        self.lbl_estado.pack(pady=(4, 0))
+        self.lbl_estado.pack(pady=(4, 6))
+
+        # --- Barra de progreso de semanas ---
+        self.barra = ttk.Progressbar(
+            self, style="Sim.Horizontal.TProgressbar",
+            orient="horizontal", mode="determinate", length=320,
+        )
+        self.barra.pack(pady=(0, 4))
 
         # --- Etapas iniciales (entrada y clasificacion) ---
         fila = tk.Frame(self, bg=COLORES["panel_centro"])
@@ -74,15 +82,21 @@ class PanelFlujo(tk.Frame):
 
     def _etapa(self, parent, nombre, valor):
         """Caja blanca con nombre de etapa y un numero grande."""
-        caja = tk.Frame(parent, bg=COLORES["tarjeta"], width=130, height=110)
+        caja = tk.Frame(parent, bg=COLORES["tarjeta"], width=140, height=112,
+                        highlightbackground=COLORES["borde"], highlightthickness=1)
         caja.pack(side="left", padx=18)
         caja.pack_propagate(False)
-        tk.Label(caja, text=nombre, bg=COLORES["tarjeta"], fg=COLORES["texto"],
-                    font=FUENTES["texto_normal"]).pack(pady=(10, 4))
-        lbl = tk.Label(caja, text=valor, bg=COLORES["tarjeta"], fg=COLORES["texto"],
+        tk.Label(caja, text=nombre, bg=COLORES["tarjeta"], fg=COLORES["subtexto"],
+                    font=FUENTES["texto_normal"]).pack(pady=(16, 4))
+        lbl = tk.Label(caja, text=valor, bg=COLORES["tarjeta"], fg=COLORES["acento"],
                         font=FUENTES["valor_grande"])
         lbl.pack()
         return lbl
+
+    def actualizar_progreso(self, semana, total):
+        """Mueve la barra de progreso segun la semana actual."""
+        self.barra["maximum"] = total
+        self.barra["value"] = semana
 
     def actualizar(self, entrada, clasificados, venta, reciclaje, desecho):
         """La simulacion llama a esto para refrescar los numeros en pantalla."""
@@ -104,11 +118,11 @@ class PanelFlujo(tk.Frame):
         rojo    > 90%   (desbordado -> dispara Alternativa A)
         """
         if ocupacion < 0.70:
-            color = COLORES["reciclaje"]   # verde
+            color = COLORES["ok"]          # verde
         elif ocupacion <= 0.90:
-            color = "#E67E22"              # naranja
+            color = COLORES["alerta"]      # naranja
         else:
-            color = COLORES["venta"]       # rojo
+            color = COLORES["peligro"]     # rojo
 
         # Repintar todos los elementos de la card (incluida la cabecera)
         for w in (self.card_dep, self.cabecera_dep, self.lbl_dep_icono,

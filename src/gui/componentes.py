@@ -14,16 +14,21 @@ from src.gui.tema import COLORES, FUENTES
 
 
 def titulo_panel(parent, texto):
-    """Barrita gris clara con el titulo de una columna (ej: 'PARAMETROS')."""
-    barra = tk.Label(
-        parent,
+    """Barra oscura con el titulo de una columna (ej: 'PARAMETROS')."""
+    barra = tk.Frame(parent, bg=COLORES["etiqueta_bar"])
+    barra.pack(fill="x", pady=(0, 12))
+    # acento de color a la izquierda
+    tk.Frame(barra, bg=COLORES["acento"], width=4).pack(side="left", fill="y")
+    tk.Label(
+        barra,
         text=texto,
         bg=COLORES["etiqueta_bar"],
-        fg=COLORES["texto"],
+        fg=COLORES["texto_claro"],
         font=FUENTES["titulo_panel"],
-        pady=4,
-    )
-    barra.pack(fill="x", pady=(0, 10))
+        pady=8,
+        padx=10,
+        anchor="w",
+    ).pack(side="left", fill="x", expand=True)
     return barra
 
 
@@ -124,22 +129,31 @@ def tarjeta_canal(parent, nombre, color, valor="0"):
     Tarjeta de color de un canal de salida (Venta/Reciclaje/Desecho)
     con su nombre y la cantidad de unidades.
     """
-    card = tk.Frame(parent, bg=color, width=110, height=70)
+    card = tk.Frame(parent, bg=color, width=120, height=92)
     card.pack_propagate(False)
 
-    tk.Label(card, text=nombre, bg=color, fg="white",
-    font=FUENTES["valor_medio"]).pack(pady=(6, 0))
+    # franja superior un poco mas oscura como acento
+    tk.Frame(card, bg=color, height=6).pack(fill="x")
     lbl_valor = tk.Label(card, text=valor, bg=color, fg="white",
     font=FUENTES["valor_grande"])
-    lbl_valor.pack()
+    lbl_valor.pack(pady=(10, 0))
+    tk.Label(card, text=nombre, bg=color, fg="white",
+    font=FUENTES["texto_normal"]).pack()
     return card, lbl_valor
 
 
 def metrica(parent, titulo, valor):
-    """Un resultado de texto: titulo arriba, valor grande abajo."""
-    tk.Label(parent, text=titulo, bg=parent["bg"], fg=COLORES["subtexto"],
-    font=FUENTES["texto_normal"]).pack(pady=(10, 0))
-    lbl = tk.Label(parent, text=valor, bg=parent["bg"], fg=COLORES["texto"],
-    font=FUENTES["valor_medio"])
-    lbl.pack()
+    """Tarjeta de resultado: etiqueta arriba, valor grande abajo, con borde."""
+    card = tk.Frame(parent, bg=COLORES["superficie_alt"],
+                    highlightbackground=COLORES["borde"], highlightthickness=1)
+    card.pack(fill="x", pady=6)
+    # acento de color a la izquierda
+    tk.Frame(card, bg=COLORES["acento"], width=4).pack(side="left", fill="y")
+    interior = tk.Frame(card, bg=COLORES["superficie_alt"], padx=12, pady=10)
+    interior.pack(side="left", fill="x", expand=True)
+    tk.Label(interior, text=titulo, bg=COLORES["superficie_alt"], fg=COLORES["subtexto"],
+    font=FUENTES["etiqueta_mini"], anchor="w").pack(fill="x")
+    lbl = tk.Label(interior, text=valor, bg=COLORES["superficie_alt"], fg=COLORES["texto"],
+    font=FUENTES["valor_medio"], anchor="w")
+    lbl.pack(fill="x")
     return lbl

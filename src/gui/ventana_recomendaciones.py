@@ -41,7 +41,7 @@ class VentanaRecomendaciones:
     def _tarjeta(self, parent, a):
         """Una tarjeta por alternativa, con franja de color segun estado."""
         # Rojo si hay accion requerida (condicion activa), verde si esta OK
-        color = COLORES["venta"] if a["activa"] else COLORES["reciclaje"]
+        color = COLORES["peligro"] if a["activa"] else COLORES["ok"]
         estado = "ACCION REQUERIDA" if a["activa"] else "SIN CAMBIOS"
 
         card = tk.Frame(parent, bg=COLORES["tarjeta"], bd=0)
