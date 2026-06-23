@@ -42,19 +42,19 @@ class VentanaPrincipal:
         self.root.minsize(1100, 640)
 
     def _header(self):
-        barra = tk.Frame(self.root, bg=COLORES["header"], height=64)
+        barra = tk.Frame(self.root, bg=COLORES["header"], height=82)
         barra.pack(fill="x")
         barra.pack_propagate(False)
 
         # bloque de titulo + subtitulo a la izquierda
         izq = tk.Frame(barra, bg=COLORES["header"])
-        izq.pack(side="left", padx=22, pady=10)
+        izq.pack(side="left", padx=22)
         tk.Label(izq, text="Simulador de Clasificacion de RAEE",
         bg=COLORES["header"], fg=COLORES["texto_claro"],
-        font=FUENTES["titulo_app"], anchor="w").pack(anchor="w")
+        font=FUENTES["titulo_app"], anchor="w").pack(anchor="w", pady=(14, 0))
         tk.Label(izq, text="Optimizacion del proceso de clasificacion  -  v1.0",
         bg=COLORES["header"], fg="#94A3B8",
-        font=FUENTES["subtitulo_app"], anchor="w").pack(anchor="w")
+        font=FUENTES["subtitulo_app"], anchor="w").pack(anchor="w", pady=(2, 0))
 
         tk.Label(barra, text="Scrap & Rezagos S.R.L.",
         bg=COLORES["header"], fg=COLORES["header_acento"],
