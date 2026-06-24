@@ -36,27 +36,32 @@ def _atender(env, mesa, p, llegada, m: MetricasColas):
 
 
 def _generar_llegadas(env, mesa, p, m: MetricasColas, duracion_semanas, lotes_semanas):
-    # distribucion uniforme para llegadas
-    total_min = p.minutos_periodo()
-    horas_arribos = []
-    lotes_horas = []
+    # hora de arribo de cada lote (uniforme dentro de su semana)
+    fin = p.minutos_periodo()
+    arribos = []
     for semana in range(duracion_semanas):
         base = semana * p.dias_semana_laboral * p.horas_dia * 60
         ancho = p.dias_semana_laboral * p.horas_dia * 60
         for lote in lotes_semanas[semana]:
-            hora = base + random.uniform(0, ancho)
-            horas_arribos.append(hora)
-            lotes_horas.append((hora, lotes_semanas[semana][lotes_semanas[semana].index(lote)]))
-    horas_arribos.sort()
-    lotes_horas.sort(key=lambda x: x[0])
+            arribos.append((base + random.uniform(0, ancho), lote))
+    arribos.sort(key=lambda x: x[0])
+
+    # los dispositivos de cada lote entran escalonados a la mesa,
+    # repartidos entre el arribo del lote y el del lote siguiente
+    eventos = []
+    for i, (hora, lote) in enumerate(arribos):
+        hora_sig = arribos[i + 1][0] if i + 1 < len(arribos) else fin
+        ventana = max(hora_sig - hora, 1.0)
+        n = len(lote) or 1
+        for k in range(len(lote)):
+            eventos.append(hora + ventana * (k / n))
+    eventos.sort()
 
     t_anterior = 0.0
-    for hora in horas_arribos:
-        yield env.timeout(max(hora - t_anterior, 0))
-        t_anterior = hora
-        lote = lotes_horas[horas_arribos.index(hora)][1]
-        for _ in lote:
-            env.process(_atender(env, mesa, p, env.now, m))
+    for t in eventos:
+        yield env.timeout(max(t - t_anterior, 0))
+        t_anterior = t
+        env.process(_atender(env, mesa, p, env.now, m))
 
 
 def simular_colas(p: Parametros, duracion_semanas, lotes_semanas) -> dict:

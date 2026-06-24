@@ -77,7 +77,9 @@ class ModeloSimulacion:
 
     def correr(self) -> Resultados:
         """Corre la simulacion completa (todas las semanas + colas)."""
+        lotes_semanas = []
         for _ in range(self.p.semanas_simulacion):
             self.correr_semana()
-        self.calcular_colas()
+            lotes_semanas.append(self.resultados.lotes_semana)
+        self.calcular_colas(self.p.semanas_simulacion, lotes_semanas)
         return self.resultados
