@@ -44,30 +44,19 @@ class PanelResultados(tk.Frame):
             self, bg=COLORES["superficie_alt"],
             highlightbackground=COLORES["borde"], highlightthickness=1)
         self.contenedor_graficos.pack(fill="both", expand=True, pady=(16, 0))
-        self._placeholder_graficos()
-
-    def _placeholder_graficos(self):
-        self.lbl_placeholder = tk.Label(
-            self.contenedor_graficos,
-            text="📊\n\ngraficos de arribos\ny ganancias",
-            bg=COLORES["superficie_alt"], fg=COLORES["subtexto"],
-            font=FUENTES["texto_normal"], justify="center")
-        self.lbl_placeholder.pack(expand=True)
+        self.mostrar_graficos([])   # los dos graficos estan siempre presentes
 
     def limpiar_graficos(self):
         for w in self.contenedor_graficos.winfo_children():
             w.destroy()
 
     def mostrar_graficos(self, serie):
-        """Dibuja los dos graficos a partir de la serie semanal de la corrida."""
+        """Dibuja los dos graficos (siempre): vacios sin datos, con datos tras simular."""
         from src.graficos import dashboard
         self.limpiar_graficos()
-        if not serie:
-            self._placeholder_graficos()
-            return
-        semanas = [s["semana"] for s in serie]
-        arribos = [s["arribos"] for s in serie]
-        neta    = [s["neta"] for s in serie]
+        semanas = [s["semana"] for s in serie] if serie else []
+        arribos = [s["arribos"] for s in serie] if serie else []
+        neta    = [s["neta"] for s in serie] if serie else []
         w1 = dashboard.crear_grafico_arribos(self.contenedor_graficos, semanas, arribos)
         w1.pack(fill="x", padx=6, pady=(8, 4))
         w2 = dashboard.crear_grafico_ganancias(self.contenedor_graficos, semanas, neta)

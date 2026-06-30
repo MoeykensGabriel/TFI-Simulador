@@ -29,12 +29,22 @@ def _miles(valor):
     return f"{valor/1000:.0f}k" if abs(valor) >= 1000 else f"{valor:.0f}"
 
 
+def _sin_datos(ax):
+    ax.text(0.5, 0.5, "sin datos aun", ha="center", va="center",
+            transform=ax.transAxes, color=COLORES["subtexto"], fontsize=8)
+    ax.set_xticks([])
+    ax.set_yticks([])
+
+
 def crear_grafico_arribos(parent, semanas, arribos):
     """Barras: dispositivos que ingresaron en cada semana."""
     fig, ax = _nueva_figura()
-    ax.bar([f"S{s}" for s in semanas], arribos, color=COLORES["venta"], width=0.6)
-    ax.yaxis.set_major_formatter(FuncFormatter(lambda v, _: _miles(v)))
+    if semanas:
+        ax.bar([f"S{s}" for s in semanas], arribos, color=COLORES["venta"], width=0.6)
+        ax.yaxis.set_major_formatter(FuncFormatter(lambda v, _: _miles(v)))
     _estilizar(ax, "Arribos por semana")
+    if not semanas:
+        _sin_datos(ax)
     fig.tight_layout(pad=0.7)
     canvas = FigureCanvasTkAgg(fig, master=parent)
     canvas.draw()
@@ -44,12 +54,15 @@ def crear_grafico_arribos(parent, semanas, arribos):
 def crear_grafico_ganancias(parent, semanas, neta_acum):
     """Area + linea: ganancia neta acumulada semana a semana."""
     fig, ax = _nueva_figura()
-    etiquetas = [f"S{s}" for s in semanas]
-    ax.plot(etiquetas, neta_acum, color=COLORES["reciclaje"], linewidth=2,
-            marker="o", markersize=4)
-    ax.fill_between(range(len(etiquetas)), neta_acum, color=COLORES["reciclaje"], alpha=0.18)
-    ax.yaxis.set_major_formatter(FuncFormatter(lambda v, _: f"${_miles(v)}"))
+    if semanas:
+        etiquetas = [f"S{s}" for s in semanas]
+        ax.plot(etiquetas, neta_acum, color=COLORES["reciclaje"], linewidth=2,
+                marker="o", markersize=4)
+        ax.fill_between(range(len(etiquetas)), neta_acum, color=COLORES["reciclaje"], alpha=0.18)
+        ax.yaxis.set_major_formatter(FuncFormatter(lambda v, _: f"${_miles(v)}"))
     _estilizar(ax, "Ganancia neta acumulada")
+    if not semanas:
+        _sin_datos(ax)
     fig.tight_layout(pad=0.7)
     canvas = FigureCanvasTkAgg(fig, master=parent)
     canvas.draw()

@@ -20,7 +20,7 @@ PRECIOS_CEL_MAX = [300, 325, 350, 375, 400]
 PRECIOS_TAB_MIN = [200, 225, 250, 275, 300]
 PRECIOS_TAB_MAX = [450, 500, 550, 600]
 MARGENES        = [5, 10, 15, 20, 25]         # %
-SALARIOS        = [800, 900, 1000, 1100, 1200] # x1000 ARS
+SALARIOS        = [800000, 900000, 1000000, 1100000, 1200000, 1500000] # ARS reales
 
 
 class PanelParametros(tk.Frame):
@@ -91,7 +91,7 @@ class PanelParametros(tk.Frame):
         self.operarios = campo_parametro(parent, "Cantidad de operarios", range(3,10), 3)
 
         # --- Salario tecnico ---
-        self.salario   = campo_parametro(parent, "Salario tecnico (miles $)", SALARIOS, 1100)
+        self.salario   = campo_parametro(parent, "Salario tecnico ($)", SALARIOS, 1100000)
 
         # --- Semanas de simulacion (4 a 12) ---
         self.semanas   = campo_parametro(parent, "Semanas de simulacion", range(4, 13), 4)
@@ -129,7 +129,7 @@ class PanelParametros(tk.Frame):
             "tab_precio_max": int(self.tab_max.get()) * 1000,
             "margen":         int(self.margen.get()),
             "operarios":      int(self.operarios.get()),
-            "salario":        int(self.salario.get()) * 1000,
+            "salario":        int(self.salario.get()),
             "semanas":        int(self.semanas.get()),
         }
 

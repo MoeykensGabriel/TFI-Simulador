@@ -146,8 +146,7 @@ class VentanaPrincipal:
         rid = self._run_id
         self._puntos = 0
         self.panel_result.esconder_boton_recomendaciones()
-        self.panel_result.limpiar_graficos()
-        self.panel_result._placeholder_graficos()
+        self.panel_result.mostrar_graficos([])   # resetea a graficos vacios
         self.panel_flujo.actualizar_deposito(0)
         self.panel_flujo.actualizar_progreso(0, self.total_semanas)
         self.panel_flujo.limpiar_animacion()
