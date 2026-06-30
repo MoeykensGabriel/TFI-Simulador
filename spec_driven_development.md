@@ -42,27 +42,27 @@ Acumulada
 
 Reventa 
 
-0,37 
+0,30 
 
-0,37 
+0,30 
 
 Reciclaje 
 
-0,46 
+0,40 
 
-0,83 
+0,70 
 
 Desecho 
 
-0,17 
+0,30 
 
 1 
 
 
-Canal de Reventa: Para dispositivos funcionales que conservan valor comercial. Estos equipos deben someterse a un protocolo de borrado seguro de datos antes de ser reinsertados en el mercado para su venta. Estos son el 37 % de los dispositivos y los precios de reventa de los dispositivos comprenden entre $150.000 ARS y $350.000 ARS por unidad para celulares, y entre $250.000 ARS y $550.000 ARS por unidad para Tablets. 
+Canal de Reventa: Para dispositivos funcionales que conservan valor comercial. Estos equipos deben someterse a un protocolo de borrado seguro de datos antes de ser reinsertados en el mercado para su venta. Estos son el 30 % de los dispositivos y los precios de reventa de los dispositivos comprenden entre $150.000 ARS y $350.000 ARS por unidad para celulares, y entre $250.000 ARS y $550.000 ARS por unidad para Tablets. 
 
 
-Canal de Reciclaje: Para equipos con daños estructurales o software obsoleto. Se procede al desmantelamiento para la recuperación de elementos. La composicion de los dispositivos se divide en Plásticos, Metales y Vidrios. Estos son el 46 % de los dispositivos.  
+Canal de Reciclaje: Para equipos con daños estructurales o software obsoleto. Se procede al desmantelamiento para la recuperación de elementos. La composicion de los dispositivos se divide en Plásticos, Metales y Vidrios. Estos son el 40 % de los dispositivos.  
 
 Tabla de composición de dispositivos 
 
@@ -100,7 +100,7 @@ $0/kg
 
  
 
-Canal de Desecho (Gris en el prototipo): Para componentes sin valor de recuperación o materiales peligrosos que requieren disposición final controlada. Estos son el 17 % de los dispositivos. 
+Canal de Desecho (Gris en el prototipo): Para componentes sin valor de recuperación o materiales peligrosos que requieren disposición final controlada. Estos son el 30 % de los dispositivos. 
 
  
 
@@ -155,7 +155,7 @@ Decide (Rombos de bifurcación lógica): Actúan como los controladores de flujo
 
 Usan la variante 2-way by Condition para comprobar atributos matemáticos (por ejemplo, validar si TipoDispositivo == 1 para asignar sus respectivos rangos de peso con UNIF). 
 
-Usan la variante N-way by Chance para el desvío probabilístico final de los canales de salida según los porcentajes: 37% para Reventa, 46% para Reciclaje y 17% para Desecho. 
+Usan la variante N-way by Chance para el desvío probabilístico final de los canales de salida según los porcentajes: 30% para Reventa, 40% para Reciclaje y 30% para Desecho. 
 
 Process (Mesa de Clasificación): Modela el núcleo de atención del sistema como un nodo de servicio de servidores en paralelo (M/M/3). Utiliza la lógica Seize Delay Release asociada al recurso Operario Tecnico con una capacidad global de 3. Si los 3 Operarios están ocupados, las entidades forman una fila automática bajo disciplina FIFO, permitiendo medir los indicadores de Theory of Queues: longitud promedio de la fila (L_q) y tiempo de espera (W_q). 
 

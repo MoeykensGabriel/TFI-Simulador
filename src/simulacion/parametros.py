@@ -45,10 +45,10 @@ class Parametros:
     dias_semana_laboral: int = 5      # jornada: dias por semana
     capacidad_deposito: int = 10000   # capacidad del deposito (dispositivos)
 
-    # --- Probabilidades de canal (acumuladas: 0.37 / 0.83 / 1.00) ---
-    prop_venta: float = 0.37
-    prop_reciclaje: float = 0.46
-    prop_desecho: float = 0.17
+    # --- Probabilidades de canal (acumuladas: 0.30 / 0.70 / 1.00) ---
+    prop_venta: float = 0.30
+    prop_reciclaje: float = 0.40
+    prop_desecho: float = 0.30
 
     # --- Precios de reventa (ARS por unidad) ---
     cel_precio_min: float = 150_000
