@@ -90,9 +90,10 @@ def campo_rango(parent, etiqueta, etiqueta_min, etiqueta_max, opciones_min, opci
 
     return var_min, var_max
 
-def campo_rango(parent, etiqueta, opciones_min, opciones_max, valor_min, valor_max):
+def campo_rango(parent, etiqueta, opciones_min, opciones_max, valor_min, valor_max,
+                lbl_min="Min", lbl_max="Max"):
     """
-    Una etiqueta + dos dropdowns (Min y Max) en el mismo renglon.
+    Una etiqueta + dos dropdowns en el mismo renglon (con etiquetas configurables).
     Devuelve dos variables: (var_min, var_max).
     """
     tk.Label(
@@ -107,15 +108,13 @@ def campo_rango(parent, etiqueta, opciones_min, opciones_max, valor_min, valor_m
     fila = tk.Frame(parent, bg=parent["bg"])
     fila.pack(fill="x")
 
-    # Min
-    tk.Label(fila, text="Min", bg=parent["bg"], fg=COLORES["subtexto"],
+    tk.Label(fila, text=lbl_min, bg=parent["bg"], fg=COLORES["subtexto"],
              font=FUENTES["texto_normal"]).pack(side="left")
     var_min = tk.StringVar(value=str(valor_min))
     ttk.Combobox(fila, textvariable=var_min, values=[str(o) for o in opciones_min],
                  state="readonly", font=FUENTES["texto_normal"], width=4).pack(side="left", padx=(2, 10))
 
-    # Max
-    tk.Label(fila, text="Max", bg=parent["bg"], fg=COLORES["subtexto"],
+    tk.Label(fila, text=lbl_max, bg=parent["bg"], fg=COLORES["subtexto"],
              font=FUENTES["texto_normal"]).pack(side="left")
     var_max = tk.StringVar(value=str(valor_max))
     ttk.Combobox(fila, textvariable=var_max, values=[str(o) for o in opciones_max],

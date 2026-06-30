@@ -21,4 +21,6 @@ def valor_materiales(d: Dispositivo, p: Parametros) -> float:
 
 
 def costo_operarios(p: Parametros) -> float:
-    return p.cantidad_operarios * p.salario_tecnico
+    # salario mensual escalado por la duracion simulada (4 semanas = 1 mes)
+    meses = p.semanas_simulacion / 4.0
+    return p.cantidad_operarios * p.salario_tecnico * meses

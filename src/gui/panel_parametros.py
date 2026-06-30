@@ -70,7 +70,8 @@ class PanelParametros(tk.Frame):
 
         # --- Tamano de lote (Media / Desviacion en el mismo renglon) ---
         self.lote_media, self.lote_desv = campo_rango(
-            parent, "Tamano de lote (kg)", [350, 400, 450, 500, 550], [50, 75, 100, 125, 150], 450, 100
+            parent, "Tamano de lote (kg)", [350, 400, 450, 500, 550], [50, 75, 100, 125, 150], 450, 100,
+            lbl_min="Media", lbl_max="Desv"
         )
 
         # --- Precio celular ARS (Min / Max) ---

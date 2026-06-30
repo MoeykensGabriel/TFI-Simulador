@@ -32,8 +32,9 @@ def generar_peso_lote(p: Parametros) -> float:
 
 
 def generar_cant_lotes(p: Parametros) -> int:
-    # uniforme para cantidad de lotes
-    return int(p.lotes_semanales_A + (p.lotes_semanales_B * random.random()) )
+    # uniforme entera entre min y max (ambos incluidos)
+    rango = p.lotes_semanales_B - p.lotes_semanales_A + 1
+    return int(p.lotes_semanales_A + rango * random.random())
 
 
 def generar_lote(p: Parametros) -> list:
