@@ -1,48 +1,91 @@
-# tema.py - colores, fuentes y medidas. unico lugar donde se tocan
+# tema.py - colores, fuentes y medidas. soporta tema claro y oscuro
 
 from tkinter import ttk
 
-# ----- Paleta de colores (moderna, slate + emerald) -----
-COLORES = {
-    # superficies
-    "fondo":          "#EEF2F6",   # fondo general de la ventana
-    "superficie":     "#FFFFFF",   # tarjetas / paneles
-    "superficie_alt": "#F8FAFC",   # tarjetas secundarias
-    "borde":          "#E2E8F0",   # bordes sutiles
+# ----- Paletas (clara y oscura) -----
+PALETAS = {
+    "claro": {
+        "fondo":          "#EEF2F6",
+        "superficie":     "#FFFFFF",
+        "superficie_alt": "#F8FAFC",
+        "borde":          "#E2E8F0",
 
-    # paneles
-    "panel_param":    "#FFFFFF",   # columna izquierda
-    "panel_centro":   "#F8FAFC",   # columna central
-    "panel_result":   "#FFFFFF",   # columna derecha
-    "etiqueta_bar":   "#0F172A",   # barritas de titulo de cada columna
+        "panel_param":    "#FFFFFF",
+        "panel_centro":   "#F8FAFC",
+        "panel_result":   "#FFFFFF",
+        "etiqueta_bar":   "#0F172A",
 
-    # header / marca
-    "header":         "#0F172A",   # barra superior (slate-900)
-    "header_acento":  "#10B981",   # linea de acento bajo el header
+        "header":         "#0F172A",
+        "header_acento":  "#10B981",
 
-    # accion principal
-    "boton":            "#059669", # emerald-600
-    "boton_hover":      "#047857", # emerald-700
-    "boton_stop":       "#DC2626", # rojo (detener)
-    "boton_stop_hover": "#B91C1C",
-    "acento":           "#059669",
+        "boton":            "#059669",
+        "boton_hover":      "#047857",
+        "boton_stop":       "#DC2626",
+        "boton_stop_hover": "#B91C1C",
+        "acento":           "#059669",
 
-    # canales de salida
-    "venta":          "#3B82F6",   # azul  - Canal de Reventa
-    "reciclaje":      "#10B981",   # verde - Canal de Reciclaje
-    "desecho":        "#64748B",   # slate - Canal de Desecho
+        "venta":          "#3B82F6",
+        "reciclaje":      "#10B981",
+        "desecho":        "#64748B",
 
-    # estados (semaforo para deposito y alternativas)
-    "ok":             "#10B981",
-    "alerta":         "#F59E0B",
-    "peligro":        "#EF4444",
+        "ok":             "#10B981",
+        "alerta":         "#F59E0B",
+        "peligro":        "#EF4444",
 
-    # tarjetas y textos
-    "tarjeta":        "#FFFFFF",
-    "texto":          "#0F172A",   # texto principal oscuro
-    "texto_claro":    "#FFFFFF",   # texto sobre fondos oscuros
-    "subtexto":       "#64748B",
+        "tarjeta":        "#FFFFFF",
+        "texto":          "#0F172A",
+        "texto_claro":    "#FFFFFF",
+        "subtexto":       "#64748B",
+    },
+    "oscuro": {
+        "fondo":          "#0B1220",
+        "superficie":     "#111A2B",
+        "superficie_alt": "#0F1A2C",
+        "borde":          "#1E293B",
+
+        "panel_param":    "#111A2B",
+        "panel_centro":   "#0D1626",
+        "panel_result":   "#111A2B",
+        "etiqueta_bar":   "#0B1220",
+
+        "header":         "#0B1220",
+        "header_acento":  "#22C55E",
+
+        "boton":            "#16A34A",
+        "boton_hover":      "#15803D",
+        "boton_stop":       "#DC2626",
+        "boton_stop_hover": "#B91C1C",
+        "acento":           "#22C55E",
+
+        "venta":          "#3B82F6",
+        "reciclaje":      "#22C55E",
+        "desecho":        "#64748B",
+
+        "ok":             "#22C55E",
+        "alerta":         "#F59E0B",
+        "peligro":        "#EF4444",
+
+        "tarjeta":        "#111A2B",
+        "texto":          "#E2E8F0",
+        "texto_claro":    "#FFFFFF",
+        "subtexto":       "#94A3B8",
+    },
 }
+
+# tema activo. el resto del codigo importa este dict y lee sus valores.
+# aplicar_tema() lo muta en el lugar para que las referencias sigan validas.
+COLORES = dict(PALETAS["claro"])
+MODO_ACTUAL = "claro"
+
+
+def aplicar_tema(modo: str) -> dict:
+    """Cambia la paleta activa (claro/oscuro) mutando COLORES en el lugar."""
+    global MODO_ACTUAL
+    MODO_ACTUAL = modo if modo in PALETAS else "claro"
+    COLORES.clear()
+    COLORES.update(PALETAS[MODO_ACTUAL])
+    return COLORES
+
 
 # ----- Tipografias -----
 FUENTES = {
@@ -61,24 +104,22 @@ FUENTES = {
 # ----- Medidas -----
 MEDIDAS = {
     "ancho_ventana":  1180,
-    "alto_ventana":   700,
+    "alto_ventana":   720,
     "ancho_param":    250,
-    "ancho_result":   270,
+    "ancho_result":   320,
     "padding":        14,
     "radio":          10,
 }
 
 
 def aplicar_estilo_ttk(root):
-    """Estiliza los widgets ttk (combobox, scrollbar, progressbar) para que
-    combinen con la paleta moderna en vez del look gris por defecto."""
+    """Estiliza los widgets ttk segun el tema activo. Re-llamar al cambiar tema."""
     style = ttk.Style(root)
     try:
         style.theme_use("clam")
     except Exception:
         pass
 
-    # Combobox
     style.configure(
         "TCombobox",
         fieldbackground=COLORES["superficie_alt"],
@@ -92,10 +133,16 @@ def aplicar_estilo_ttk(root):
     style.map(
         "TCombobox",
         fieldbackground=[("readonly", COLORES["superficie_alt"])],
+        foreground=[("readonly", COLORES["texto"])],
         bordercolor=[("focus", COLORES["acento"])],
     )
 
-    # Scrollbar
+    # lista desplegable del combobox
+    root.option_add("*TCombobox*Listbox.background", COLORES["superficie_alt"])
+    root.option_add("*TCombobox*Listbox.foreground", COLORES["texto"])
+    root.option_add("*TCombobox*Listbox.selectBackground", COLORES["acento"])
+    root.option_add("*TCombobox*Listbox.selectForeground", "#FFFFFF")
+
     style.configure(
         "Vertical.TScrollbar",
         background=COLORES["borde"],
@@ -105,7 +152,6 @@ def aplicar_estilo_ttk(root):
         relief="flat",
     )
 
-    # Progressbar (avance de semanas)
     style.configure(
         "Sim.Horizontal.TProgressbar",
         background=COLORES["acento"],

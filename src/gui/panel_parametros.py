@@ -136,6 +136,29 @@ class PanelParametros(tk.Frame):
         """Vuelve el boton a 'Iniciar' cuando la simulacion termina sola."""
         self.btn_simular.config(text="▶  Iniciar Simulacion", bg=COLORES["boton"])
 
+    def estado(self):
+        """Devuelve las selecciones crudas (para restaurarlas al cambiar de tema)."""
+        return {
+            "lotes_min": self.lotes_min.get(), "lotes_max": self.lotes_max.get(),
+            "lote_media": self.lote_media.get(), "lote_desv": self.lote_desv.get(),
+            "cel_min": self.cel_min.get(), "cel_max": self.cel_max.get(),
+            "tab_min": self.tab_min.get(), "tab_max": self.tab_max.get(),
+            "margen": self.margen.get(), "operarios": self.operarios.get(),
+            "salario": self.salario.get(), "semanas": self.semanas.get(),
+        }
+
+    def restaurar(self, e):
+        """Re-aplica selecciones guardadas con estado()."""
+        try:
+            self.lotes_min.set(e["lotes_min"]); self.lotes_max.set(e["lotes_max"])
+            self.lote_media.set(e["lote_media"]); self.lote_desv.set(e["lote_desv"])
+            self.cel_min.set(e["cel_min"]); self.cel_max.set(e["cel_max"])
+            self.tab_min.set(e["tab_min"]); self.tab_max.set(e["tab_max"])
+            self.margen.set(e["margen"]); self.operarios.set(e["operarios"])
+            self.salario.set(e["salario"]); self.semanas.set(e["semanas"])
+        except Exception:
+            pass
+
     def _iniciar(self):
         if self.al_iniciar:
             if self.al_iniciar(self.obtener_valores()):

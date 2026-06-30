@@ -39,15 +39,39 @@ class PanelResultados(tk.Frame):
         self.btn_recom.bind("<Leave>", lambda e: self.btn_recom.config(bg=COLORES["boton"]))
         # No se hace pack() todavia: aparece solo al finalizar
 
-        # --- Espacio reservado para los graficos ---
+        # --- Espacio para los graficos (arribos y ganancias) ---
         self.contenedor_graficos = tk.Frame(
             self, bg=COLORES["superficie_alt"],
             highlightbackground=COLORES["borde"], highlightthickness=1)
         self.contenedor_graficos.pack(fill="both", expand=True, pady=(16, 0))
-        tk.Label(self.contenedor_graficos,
-                    text="📊\n\ngraficos de arribos\ny ocupacion del deposito",
-                    bg=COLORES["superficie_alt"], fg=COLORES["subtexto"],
-                    font=FUENTES["texto_normal"], justify="center").pack(expand=True)
+        self._placeholder_graficos()
+
+    def _placeholder_graficos(self):
+        self.lbl_placeholder = tk.Label(
+            self.contenedor_graficos,
+            text="📊\n\ngraficos de arribos\ny ganancias",
+            bg=COLORES["superficie_alt"], fg=COLORES["subtexto"],
+            font=FUENTES["texto_normal"], justify="center")
+        self.lbl_placeholder.pack(expand=True)
+
+    def limpiar_graficos(self):
+        for w in self.contenedor_graficos.winfo_children():
+            w.destroy()
+
+    def mostrar_graficos(self, serie):
+        """Dibuja los dos graficos a partir de la serie semanal de la corrida."""
+        from src.graficos import dashboard
+        self.limpiar_graficos()
+        if not serie:
+            self._placeholder_graficos()
+            return
+        semanas = [s["semana"] for s in serie]
+        arribos = [s["arribos"] for s in serie]
+        neta    = [s["neta"] for s in serie]
+        w1 = dashboard.crear_grafico_arribos(self.contenedor_graficos, semanas, arribos)
+        w1.pack(fill="x", padx=6, pady=(8, 4))
+        w2 = dashboard.crear_grafico_ganancias(self.contenedor_graficos, semanas, neta)
+        w2.pack(fill="x", padx=6, pady=(4, 8))
 
     def actualizar(self, total, espera_min, rentabilidad, promedio_lote=0):
         """La simulacion llama a esto al terminar para mostrar los resultados."""
