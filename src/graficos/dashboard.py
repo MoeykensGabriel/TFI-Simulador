@@ -29,6 +29,24 @@ def _miles(valor):
     return f"{valor/1000:.0f}k" if abs(valor) >= 1000 else f"{valor:.0f}"
 
 
+def crear_grafico_torta(parent, conteos, etiquetas, colores):
+    """Torta de la proporcion de los tres canales (se muestra en el centro)."""
+    fig = Figure(figsize=(3.8, 3.2), dpi=100)
+    fig.patch.set_facecolor(COLORES["panel_centro"])
+    ax = fig.add_subplot(111)
+    ax.pie(
+        conteos, labels=etiquetas, colors=colores, startangle=90,
+        autopct=lambda p: f"{p:.0f}%",
+        textprops={"color": COLORES["texto"], "fontsize": 9},
+        wedgeprops={"edgecolor": COLORES["panel_centro"], "linewidth": 2},
+    )
+    ax.set_title("Distribucion por canal", color=COLORES["texto"], fontsize=11, pad=12)
+    fig.tight_layout(pad=0.5)
+    canvas = FigureCanvasTkAgg(fig, master=parent)
+    canvas.draw()
+    return canvas.get_tk_widget()
+
+
 def _sin_datos(ax):
     ax.text(0.5, 0.5, "sin datos aun", ha="center", va="center",
             transform=ax.transAxes, color=COLORES["subtexto"], fontsize=8)

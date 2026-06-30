@@ -34,8 +34,14 @@ class PanelFlujo(tk.Frame):
         )
         self.barra.pack(pady=(0, 8))
 
+        # --- Zona central: aloja el diagrama o (al terminar) la torta ---
+        self.centro = tk.Frame(self, bg=COLORES["panel_centro"])
+        self.centro.pack()
+        self._torta = None
+        self._cover = None
+
         # --- Lienzo del diagrama ---
-        self.canvas = tk.Canvas(self, width=_CW, height=_CH,
+        self.canvas = tk.Canvas(self.centro, width=_CW, height=_CH,
                                 bg=COLORES["panel_centro"], highlightthickness=0)
         self.canvas.pack()
 
@@ -155,6 +161,49 @@ class PanelFlujo(tk.Frame):
         for icono in self._dispositivos:
             self.canvas.delete(icono)
         self._dispositivos = []
+
+    # ----------------------------------------------------------
+    #  Transicion final: el diagrama se desvanece y aparece la torta
+    # ----------------------------------------------------------
+    def mostrar_grafico_final(self, conteos, animar=True):
+        if animar:
+            self._fade_canvas(0, conteos)
+        else:
+            self._swap_a_torta(conteos)
+
+    def _fade_canvas(self, step, conteos):
+        """Cubre el diagrama con un velo del color de fondo, cada vez mas denso."""
+        patrones = ["gray12", "gray25", "gray50", "gray75", ""]
+        if step == 0:
+            self._cover = self.canvas.create_rectangle(
+                0, 0, _CW, _CH, fill=COLORES["panel_centro"], outline="")
+        if step < len(patrones):
+            self.canvas.itemconfig(self._cover, stipple=patrones[step])
+            self.after(70, lambda: self._fade_canvas(step + 1, conteos))
+        else:
+            self._swap_a_torta(conteos)
+
+    def _swap_a_torta(self, conteos):
+        from src.graficos import dashboard
+        self.canvas.pack_forget()
+        if self._torta is not None:
+            self._torta.destroy()
+        self._torta = dashboard.crear_grafico_torta(
+            self.centro, list(conteos),
+            ["Venta", "Reciclaje", "Desecho"],
+            [COLORES["venta"], COLORES["reciclaje"], COLORES["desecho"]])
+        self._torta.pack(expand=True)
+
+    def restaurar_diagrama(self):
+        """Vuelve a mostrar el diagrama (al iniciar una nueva simulacion)."""
+        if self._torta is not None:
+            self._torta.destroy()
+            self._torta = None
+        if self._cover is not None:
+            self.canvas.delete(self._cover)
+            self._cover = None
+        if not self.canvas.winfo_ismapped():
+            self.canvas.pack()
 
     # ----------------------------------------------------------
     #  Deposito

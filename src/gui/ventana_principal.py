@@ -119,6 +119,7 @@ class VentanaPrincipal:
         self.panel_flujo.actualizar_deposito(r.ocupacion_deposito)
         self.panel_flujo.actualizar_estado(
             f"Simulacion finalizada ({self.total_semanas} semanas)", color=COLORES["ok"])
+        self.panel_flujo.mostrar_grafico_final((r.a_venta, r.a_reciclaje, r.a_desecho), animar=False)
         self.panel_result.actualizar(total=r.total_procesados, espera_min=round(r.wq_min),
                                      rentabilidad=r.ganancia_neta, promedio_lote=r.promedio_por_lote)
         self.panel_result.mostrar_graficos(self.serie)
@@ -147,6 +148,7 @@ class VentanaPrincipal:
         self._puntos = 0
         self.panel_result.esconder_boton_recomendaciones()
         self.panel_result.mostrar_graficos([])   # resetea a graficos vacios
+        self.panel_flujo.restaurar_diagrama()   # vuelve el diagrama si quedo la torta
         self.panel_flujo.actualizar_deposito(0)
         self.panel_flujo.actualizar_progreso(0, self.total_semanas)
         self.panel_flujo.limpiar_animacion()
@@ -209,6 +211,7 @@ class VentanaPrincipal:
         self.panel_flujo.actualizar_deposito(r.ocupacion_deposito)
         self.panel_flujo.actualizar_estado(
             f"Simulacion finalizada ({self.semana_actual} semanas)", color=COLORES["ok"])
+        self.panel_flujo.mostrar_grafico_final((r.a_venta, r.a_reciclaje, r.a_desecho))
         self.alternativas = evaluar_alternativas(r, self.modelo.p)
         self.panel_result.mostrar_boton_recomendaciones()
         self.panel_param.resetear_boton()
