@@ -55,10 +55,13 @@ class PanelParametros(tk.Frame):
         self.interior.bind("<Configure>", _actualizar_scroll)
         canvas.bind("<Configure>", _ajustar_ancho)
 
-        # Scroll con la rueda del mouse
-        canvas.bind_all("<MouseWheel>", lambda e: canvas.yview_scroll(
-            int(-1 * (e.delta / 120)), "units"
-        ))
+        # Scroll con la rueda del mouse (a prueba de canvas destruido / evento vacio)
+        def _scroll(e=None):
+            try:
+                canvas.yview_scroll(int(-1 * (e.delta / 120)), "units")
+            except (AttributeError, tk.TclError):
+                pass
+        canvas.bind_all("<MouseWheel>", _scroll)
 
         self._construir(self.interior)
 

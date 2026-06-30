@@ -163,15 +163,16 @@ class PanelFlujo(tk.Frame):
         self._dispositivos = []
 
     # ----------------------------------------------------------
-    #  Transicion final: el diagrama se desvanece y aparece la torta
+    #  Transicion final: el diagrama se desvanece y aparece el dashboard
+    #  (torta + arribos + ganancias) en el centro
     # ----------------------------------------------------------
-    def mostrar_grafico_final(self, conteos, animar=True):
+    def mostrar_dashboard(self, conteos, serie, animar=True):
         if animar:
-            self._fade_canvas(0, conteos)
+            self._fade_canvas(0, conteos, serie)
         else:
-            self._swap_a_torta(conteos)
+            self._swap_a_dashboard(conteos, serie)
 
-    def _fade_canvas(self, step, conteos):
+    def _fade_canvas(self, step, conteos, serie):
         """Cubre el diagrama con un velo del color de fondo, cada vez mas denso."""
         patrones = ["gray12", "gray25", "gray50", "gray75", ""]
         if step == 0:
@@ -179,20 +180,35 @@ class PanelFlujo(tk.Frame):
                 0, 0, _CW, _CH, fill=COLORES["panel_centro"], outline="")
         if step < len(patrones):
             self.canvas.itemconfig(self._cover, stipple=patrones[step])
-            self.after(70, lambda: self._fade_canvas(step + 1, conteos))
+            self.after(70, lambda: self._fade_canvas(step + 1, conteos, serie))
         else:
-            self._swap_a_torta(conteos)
+            self._swap_a_dashboard(conteos, serie)
 
-    def _swap_a_torta(self, conteos):
+    def _swap_a_dashboard(self, conteos, serie):
         from src.graficos import dashboard
         self.canvas.pack_forget()
         if self._torta is not None:
             self._torta.destroy()
-        self._torta = dashboard.crear_grafico_torta(
-            self.centro, list(conteos),
+        self._torta = tk.Frame(self.centro, bg=COLORES["panel_centro"])
+        self._torta.pack(fill="both", expand=True)
+
+        # torta arriba
+        torta = dashboard.crear_grafico_torta(
+            self._torta, list(conteos),
             ["Venta", "Reciclaje", "Desecho"],
             [COLORES["venta"], COLORES["reciclaje"], COLORES["desecho"]])
-        self._torta.pack(expand=True)
+        torta.pack(pady=(0, 4))
+
+        # arribos y ganancias debajo, lado a lado
+        semanas = [s["semana"] for s in serie] if serie else []
+        arribos = [s["arribos"] for s in serie] if serie else []
+        neta    = [s["neta"] for s in serie] if serie else []
+        fila = tk.Frame(self._torta, bg=COLORES["panel_centro"])
+        fila.pack()
+        g1 = dashboard.crear_grafico_arribos(fila, semanas, arribos)
+        g1.pack(side="left", padx=6)
+        g2 = dashboard.crear_grafico_ganancias(fila, semanas, neta)
+        g2.pack(side="left", padx=6)
 
     def restaurar_diagrama(self):
         """Vuelve a mostrar el diagrama (al iniciar una nueva simulacion)."""

@@ -7,10 +7,10 @@ from src.gui.tema import COLORES
 
 
 def _nueva_figura():
-    fig = Figure(figsize=(3.0, 1.8), dpi=100)
-    fig.patch.set_facecolor(COLORES["superficie_alt"])
+    fig = Figure(figsize=(2.8, 1.9), dpi=100)
+    fig.patch.set_facecolor(COLORES["panel_centro"])
     ax = fig.add_subplot(111)
-    ax.set_facecolor(COLORES["superficie_alt"])
+    ax.set_facecolor(COLORES["panel_centro"])
     return fig, ax
 
 
