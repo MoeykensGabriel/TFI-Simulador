@@ -9,7 +9,7 @@
 # ============================================================
 
 import tkinter as tk
-from tkinter import ttk
+from tkinter import ttk, messagebox
 from src.gui.tema import COLORES, FUENTES
 from src.gui.componentes import titulo_panel, campo_parametro, campo_rango
 
@@ -21,6 +21,8 @@ PRECIOS_TAB_MIN = [200, 225, 250, 275, 300]
 PRECIOS_TAB_MAX = [450, 500, 550, 600]
 MARGENES        = [5, 10, 15, 20, 25]         # %
 SALARIOS        = [800000, 900000, 1000000, 1100000, 1200000, 1500000] # ARS reales
+PROB_VENTA      = [10, 15, 20, 25, 30, 35, 40, 45, 50]   # % reventa
+PROB_RECICLAJE  = [20, 25, 30, 35, 40, 45, 50, 55, 60]   # % reciclaje
 
 
 class PanelParametros(tk.Frame):
@@ -84,6 +86,16 @@ class PanelParametros(tk.Frame):
             parent, "Precio tablet (miles $)", PRECIOS_TAB_MIN, PRECIOS_TAB_MAX, 250, 550
         )
 
+        # --- Probabilidades de canal (Desecho se calcula solo) ---
+        self.prob_venta = campo_parametro(parent, "Reventa (%)", PROB_VENTA, 30)
+        self.prob_recic = campo_parametro(parent, "Reciclaje (%)", PROB_RECICLAJE, 40)
+        self.lbl_desecho = tk.Label(parent, text="Desecho (%): 30",
+                                    bg=parent["bg"], fg=COLORES["subtexto"],
+                                    font=FUENTES["etiqueta"], anchor="w")
+        self.lbl_desecho.pack(fill="x", pady=(6, 0))
+        self.prob_venta.trace_add("write", self._actualizar_desecho)
+        self.prob_recic.trace_add("write", self._actualizar_desecho)
+
         # --- Margen de rentabilidad ---
         self.margen    = campo_parametro(parent, "Margen de rentabilidad (%)", MARGENES, 15)
 
@@ -116,8 +128,24 @@ class PanelParametros(tk.Frame):
     def _color_hover(self):
         return COLORES["boton_stop_hover"] if self._corriendo() else COLORES["boton_hover"]
 
+    def _desecho_pct(self):
+        """Desecho = lo que falta para 100 (puede ser negativo si la suma pasa de 100)."""
+        try:
+            return 100 - int(self.prob_venta.get()) - int(self.prob_recic.get())
+        except (ValueError, tk.TclError):
+            return 0
+
+    def _actualizar_desecho(self, *_):
+        """Refresca la etiqueta de Desecho; la pinta en rojo si la suma es invalida."""
+        d = self._desecho_pct()
+        color = COLORES["peligro"] if d < 0 else COLORES["subtexto"]
+        self.lbl_desecho.config(text=f"Desecho (%): {d}", fg=color)
+
     def obtener_valores(self):
         """Devuelve un diccionario con todos los valores elegidos por el usuario."""
+        venta = int(self.prob_venta.get())
+        recic = int(self.prob_recic.get())
+        desecho = 100 - venta - recic
         return {
             "lotes_min":      int(self.lotes_min.get()),
             "lotes_max":      int(self.lotes_max.get()),
@@ -127,6 +155,9 @@ class PanelParametros(tk.Frame):
             "cel_precio_max": int(self.cel_max.get()) * 1000,
             "tab_precio_min": int(self.tab_min.get()) * 1000,
             "tab_precio_max": int(self.tab_max.get()) * 1000,
+            "prop_venta":     venta / 100,
+            "prop_reciclaje": recic / 100,
+            "prop_desecho":   desecho / 100,
             "margen":         int(self.margen.get()),
             "operarios":      int(self.operarios.get()),
             "salario":        int(self.salario.get()),
@@ -144,6 +175,7 @@ class PanelParametros(tk.Frame):
             "lote_media": self.lote_media.get(), "lote_desv": self.lote_desv.get(),
             "cel_min": self.cel_min.get(), "cel_max": self.cel_max.get(),
             "tab_min": self.tab_min.get(), "tab_max": self.tab_max.get(),
+            "prob_venta": self.prob_venta.get(), "prob_recic": self.prob_recic.get(),
             "margen": self.margen.get(), "operarios": self.operarios.get(),
             "salario": self.salario.get(), "semanas": self.semanas.get(),
         }
@@ -155,12 +187,20 @@ class PanelParametros(tk.Frame):
             self.lote_media.set(e["lote_media"]); self.lote_desv.set(e["lote_desv"])
             self.cel_min.set(e["cel_min"]); self.cel_max.set(e["cel_max"])
             self.tab_min.set(e["tab_min"]); self.tab_max.set(e["tab_max"])
+            self.prob_venta.set(e["prob_venta"]); self.prob_recic.set(e["prob_recic"])
             self.margen.set(e["margen"]); self.operarios.set(e["operarios"])
             self.salario.set(e["salario"]); self.semanas.set(e["semanas"])
         except Exception:
             pass
 
     def _iniciar(self):
+        # validar que las probabilidades de canal sumen <= 100
+        if self._desecho_pct() < 0:
+            messagebox.showwarning(
+                "Probabilidades invalidas",
+                "Reventa + Reciclaje no puede superar 100%.\n"
+                "Ajusta los porcentajes (Desecho es lo que falta para 100%).")
+            return
         if self.al_iniciar:
             if self.al_iniciar(self.obtener_valores()):
                 self.btn_simular.config(text="■  Detener Simulacion", bg=COLORES["boton_stop"])
